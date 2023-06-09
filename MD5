@@ -1,11 +1,12 @@
-d47abced7dea316bc9981f6050bb354c *DESCRIPTION
+1d6ce992a2eee8309b07a510975f7715 *DESCRIPTION
 ac0f489cbf865313b3c0a9c351f2ccf7 *NAMESPACE
+be898e7e202fcb313b93cadc41d20179 *NEWS.md
 fcdd1e771ac5f172da6b0f10c1476729 *R/bayesRecon-package.R
-ae02c7bb52cea46afeadb42d330328ce *R/hierarchy.R
+8971d7d98df9ab3e84f5204813410ac8 *R/hierarchy.R
 4b260560375fc806f99a8aaca950ab5f *R/reconc.R
 5932e4a505ab8df97de2d4a843c94e71 *R/reconc_MH.R
 9ddb5d6db6d453a1079a3e97e92edb3a *R/utils.R
-c098b161bd0c0bf99a0cc341a6ae9dcf *README.md
+5f2cc1ab71e66b095b6550d6d8971877 *README.md
 439bf689fa27cf9affd0335332142165 *build/partial.rdb
 6584a18dfcd767e4a5b6824c4e304fdb *man/bayesRecon-package.Rd
 2850cf0a17ddaebda92dd1206210f61d *man/figures/README-unnamed-chunk-6-1.png
@@ -23,7 +24,7 @@ fab857d90eef54146ed8b72c5526c408 *man/reconc_BUIS.Rd
 90cf047230acc06ebf2208e9cc2f2ab7 *tests/testthat/dataForTests/Monthly-Poisson_basef.csv
 5aba73b286d8f4eb7a10483c139be3c4 *tests/testthat/dataForTests/Weekly-Gaussian_S.csv
 75447a0572be637e76646ef659a6222f *tests/testthat/dataForTests/Weekly-Gaussian_basef.csv
-9fd99ea900d5711fae684abb9794cc9f *tests/testthat/test-examples.R
+1179beced7df389dce42cd0583c873f8 *tests/testthat/test-examples.R
 70af9aed263e57aa84037f5e850d4b6e *tests/testthat/test-get_hier_rows.R
 0b1d3786aec1ededb6668eee0c5ed820 *tests/testthat/test-hierarchy.R
 62c7f4776c942afa1dd15c0f654cf34c *tests/testthat/test-reconc_MCMC.R

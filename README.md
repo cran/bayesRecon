@@ -3,7 +3,19 @@
 
 # bayesRecon: BAyesian reCONciliation of hierarchical forecasts
 
+<!-- 
+<img src="./man/figures/logo.png" align="right" />
+-->
 <!-- badges: start -->
+
+[![R-CMD-check](https://github.com/IDSIA/bayesRecon/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/IDSIA/bayesRecon/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/bayesRecon)](https://CRAN.R-project.org/package=bayesRecon)
+[![](http://cranlogs.r-pkg.org/badges/grand-total/bayesRecon)](https://cran.r-project.org/package=bayesRecon)
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![License: LGPL (\>=
+3)](https://img.shields.io/badge/license-LGPL%20(%3E=%203)-yellow.svg)](https://www.gnu.org/licences/lgpl-3.0)
 <!-- badges: end -->
 
 The package `bayesRecon` implements probabilistic reconciliation of
@@ -19,7 +31,28 @@ The main functions are:
 - `reconc_MCMC`: a generic tool for the reconciliation of probabilistic
   count time series forecasts via Markov Chain Monte Carlo.
 
-## Example
+## News
+
+:boom: \[2023-05-26\] bayesRecon v0.1.0 is released!
+
+## Installation
+
+You can install the **stable** version on [R
+CRAN](https://cran.r-project.org/package=bayesRecon)
+
+``` r
+install.packages("bayesRecon")
+```
+
+You can also install the **development** version from
+[Github](https://github.com/IDSIA/bayesRecon)
+
+``` r
+# install.packages("devtools")
+devtools::install_github("IDSIA/bayesRecon")
+```
+
+## Usage
 
 Let us consider the minimal temporal hierarchy in the figure, where the
 bottom variables are the two 6-monthly forecasts and the upper variable
@@ -43,7 +76,7 @@ print(S)
 #> [3,]    0    1
 ```
 
-### Poisson base forecasts
+### Example 1: Poisson base forecasts
 
 We assume that the base forecasts are Poisson distributed, with
 parameters given by $\lambda_{Y} = 9$, $\lambda_{S_1} = 2$, and
@@ -149,7 +182,7 @@ mcmc = reconc_MCMC(
 samples_mcmc <- mcmc$reconciled_samples
 ```
 
-### Gaussian base forecasts
+### Example 2: Gaussian base forecasts
 
 We now assume that the base forecasts are Gaussian distributed, with
 parameters given by
@@ -226,3 +259,46 @@ reconciliation of forecasts for real-valued and count time series*.
 Zambon, L., Agosto, A., Giudici, P., Corani, G. (2023). *Properties of
 the reconciled distributions for Gaussian and count forecasts*.
 [arXiv.2303.15135](https://doi.org/10.48550/arXiv.2303.15135).
+
+## Contributors
+
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+<tbody>
+<tr>
+<td align="center" valign="top" width="14.28%">
+<a href="https://sites.google.com/view/darioazzimonti/home">
+<img src="https://github.com/dazzimonti.png" width="100px;" alt="Dario Azzimonti" style="border-radius:50%;border:1px solid #646464;"/><br />
+<sub><b>Dario Azzimonti</b></sub></a><br />
+<sub>(Maintainer)</sub><br />
+<a href="mailto:dario.azzimonti@gmail.com?subject=bayesRecon package!">dario.azzimonti@gmail.com</a>
+</td>
+<td align="center" valign="top" width="14.28%">
+<a href="#">
+<img src="https://github.com/nicorbtt.png" width="100px;" alt="Nicolò Rubattu" style="border-radius:50%;border:1px solid #646464;"/><br />
+<sub><b>Nicolò Rubattu</b></sub></a><br />
+<a href="mailto:nicolo.rubattu@idsia.ch?subject=bayesRecon package!">nicolo.rubattu@idsia.ch</a>
+</td>
+<td align="center" valign="top" width="14.28%">
+<a href="#">
+<img src="https://github.com/LorenzoZambon.png" width="100px;" alt="Lorenzo Zambon" style="border-radius:50%;border:1px solid #646464;"/><br />
+<sub><b>Lorenzo Zambon</b></sub></a><br />
+<a href="mailto:lorenzo.zambon@idsia.ch?subject=bayesRecon package!">lorenzo.zambon@idsia.ch</a>
+</td>
+<td align="center" valign="top" width="14.28%">
+<a href="https://sites.google.com/site/awerbhjkl678214/home">
+<img src="https://github.com/gcorani.png" width="100px;" alt="Giorgio Corani" style="border-radius:50%;border:1px solid #646464;"/><br />
+<sub><b>Giorgio Corani</b></sub></a><br />
+<a href="mailto:giorgio.corani@idsia.ch">giorgio.corani@idsia.ch</a>
+</td>
+</tr>
+</tbody>
+</table>
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+## Getting help
+
+If you encounter a clear bug, please file a minimal reproducible example
+on [GitHub](https://github.com/IDSIA/bayesRecon/issues).

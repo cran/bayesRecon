@@ -1,8 +1,8 @@
 Package: bayesRecon
 Type: Package
-Date: 2023-05-25
+Date: 2023-06-09
 Title: Probabilistic Reconciliation via Conditioning
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(person(given = "Dario",
              family = "Azzimonti",
              role = c("aut","cre"),
@@ -33,10 +33,10 @@ RoxygenNote: 7.2.3
 Suggests: testthat (>= 3.0.0)
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2023-05-26 08:33:23 UTC; dario.azzimonti
+Packaged: 2023-06-09 13:03:39 UTC; dario.azzimonti
 Author: Dario Azzimonti [aut, cre] (<https://orcid.org/0000-0001-5080-3061>),
   Nicolò Rubattu [aut] (<https://orcid.org/0000-0002-2703-1005>),
   Lorenzo Zambon [aut] (<https://orcid.org/0000-0002-8939-993X>),
   Giorgio Corani [aut] (<https://orcid.org/0000-0002-1541-8384>)
 Repository: CRAN
-Date/Publication: 2023-05-26 18:50:05 UTC
+Date/Publication: 2023-06-09 23:10:02 UTC
