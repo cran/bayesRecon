@@ -33,6 +33,10 @@ The main functions are:
 
 ## News
 
+:boom: \[2023-08-23\] Added the vignette “Probabilistic Reconciliation
+via Conditioning with bayesRecon”. Added the `schaferStrimmer_cov`
+function.
+
 :boom: \[2023-05-26\] bayesRecon v0.1.0 is released!
 
 ## Installation
@@ -41,7 +45,7 @@ You can install the **stable** version on [R
 CRAN](https://cran.r-project.org/package=bayesRecon)
 
 ``` r
-install.packages("bayesRecon")
+install.packages("bayesRecon", dependencies = TRUE)
 ```
 
 You can also install the **development** version from
@@ -49,7 +53,7 @@ You can also install the **development** version from
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("IDSIA/bayesRecon")
+devtools::install_github("IDSIA/bayesRecon", build_vignettes = TRUE, dependencies = TRUE)
 ```
 
 ## Usage
@@ -246,19 +250,19 @@ Corani, G., Azzimonti, D., Augusto, J.P.S.C., Zaffalon, M. (2021).
 In: Hutter, F., Kersting, K., Lijffijt, J., Valera, I. (eds) Machine
 Learning and Knowledge Discovery in Databases. ECML PKDD 2020. Lecture
 Notes in Computer Science(), vol 12459. Springer, Cham.
-[DOI:10.1007/978-3-030-67664-3_13](https://doi.org/10.1007/978-3-030-67664-3_13).
+[DOI](https://doi.org/10.1007/978-3-030-67664-3_13)
 
-Corani, G., Rubattu, N., Azzimonti, D., Antonucci, A. (2022).
-*Probabilistic reconciliation of count time series*.
-[arXiv.2207.09322](https://doi.org/10.48550/arXiv.2207.09322).
+Corani, G., Azzimonti, D., Rubattu, N. (2023). *Probabilistic
+reconciliation of count time series*.
+[DOI](https://doi.org/10.1016/j.ijforecast.2023.04.003)
 
 Zambon, L., Azzimonti, D. & Corani, G. (2022). *Efficient probabilistic
 reconciliation of forecasts for real-valued and count time series*.
-[arXiv.2210.02286](https://doi.org/10.48550/arXiv.2210.02286).
+[DOI](https://doi.org/10.48550/arXiv.2210.02286)
 
 Zambon, L., Agosto, A., Giudici, P., Corani, G. (2023). *Properties of
 the reconciled distributions for Gaussian and count forecasts*.
-[arXiv.2303.15135](https://doi.org/10.48550/arXiv.2303.15135).
+[DOI](https://doi.org/10.48550/arXiv.2303.15135)
 
 ## Contributors
 

@@ -9,7 +9,11 @@
     "poisson"  = {
       samples = stats::rpois(n=n, lambda = params[[1]]) },
     "negbin"   = {
-      samples = stats::rnbinom(n=n, size = params[[1]], prob = params[[2]]) },
+      samples <-if (params[[2]] == 0) {
+          stats::rpois(n=n, lambda = params[[1]])
+        } else {
+          stats::rnbinom(n=n, mu = params[[1]], size = params[[2]])
+        } },
   )
   return(samples)
 }
@@ -21,7 +25,7 @@
     "poisson"  = {
       pmf = stats::dpois(x=x, lambda = params[[1]]) },
     "negbin"   = {
-      pmf = stats::dnbinom(x=x, size = params[[1]], prob = params[[2]]) },
+      pmf = stats::dnbinom(x=x, mu = params[[1]], size = params[[2]]) },
   )
   return(pmf)
 }
@@ -32,6 +36,7 @@
   return(w)
 }
 .fix_weights <- function(w) {
+  # print(paste("% not support:", mean(is.na(w))))
   w[is.na(w)] = 0
   if (sum(w) == 0) {
     w = w + 1
@@ -337,7 +342,7 @@ reconc_BUIS <- function(S,
 #'upper_cov    <- analytic_rec$upper_reconciled_covariance
 #'
 #' @references
-#' Corani, G., Azzimonti, D., Augusto, J.P.S.C., Zaffalon, M. (2021). *Probabilistic Reconciliation of Hierarchical Forecast via Bayes’ Rule*. In: Hutter, F., Kersting, K., Lijffijt, J., Valera, I. (eds) Machine Learning and Knowledge Discovery in Databases. ECML PKDD 2020. Lecture Notes in Computer Science(), vol 12459. Springer, Cham. \doi{10.1007/978-3-030-67664-3_13}.
+#' Corani, G., Azzimonti, D., Augusto, J.P.S.C., Zaffalon, M. (2021). *Probabilistic Reconciliation of Hierarchical Forecast via Bayes' Rule*. In: Hutter, F., Kersting, K., Lijffijt, J., Valera, I. (eds) Machine Learning and Knowledge Discovery in Databases. ECML PKDD 2020. Lecture Notes in Computer Science(), vol 12459. Springer, Cham. \doi{10.1007/978-3-030-67664-3_13}.
 #'
 #' Zambon, L., Agosto, A., Giudici, P., Corani, G. (2023). *Properties of the reconciled distributions for Gaussian and count forecasts*. \doi{10.48550/arXiv.2303.15135}.
 #'
