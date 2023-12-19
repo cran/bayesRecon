@@ -1,4 +1,4 @@
-#' A time series from the M3 forecasting competition
+#' Example of a time series from the M3 forecasting competition
 #'
 #' A monthly time series, from the M3 forecasting competition ("N1485").
 #'
@@ -7,4 +7,4 @@
 #' 
 #' 
 #' @source [https://forecasters.org/resources/time-series-data/m3-competition/](https://forecasters.org/resources/time-series-data/m3-competition/)
-"M3example"
+"M3_example"

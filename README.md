@@ -33,6 +33,9 @@ The main functions are:
 
 ## News
 
+:boom: \[2023-12-19\] Added the vignette “Properties of the reconciled
+distribution via conditioning”.
+
 :boom: \[2023-08-23\] Added the vignette “Probabilistic Reconciliation
 via Conditioning with bayesRecon”. Added the `schaferStrimmer_cov`
 function.
@@ -234,8 +237,8 @@ Sigma <- diag(sigmas ^ 2)  #transform into covariance matrix
 analytic_rec <- reconc_gaussian(S,
                                 base_forecasts.mu = mus,
                                 base_forecasts.Sigma = Sigma)
-analytic_means <- c(analytic_rec$upper_reconciled_mean,
-                    analytic_rec$bottom_reconciled_mean) 
+analytic_means_bottom <- analytic_rec$bottom_reconciled_mean
+analytic_means <- S %*% analytic_means_bottom
 ```
 
 The base means of $Y$, $S_1$, and $S_2$ are 9, 2, 4.
@@ -256,9 +259,9 @@ Corani, G., Azzimonti, D., Rubattu, N. (2023). *Probabilistic
 reconciliation of count time series*.
 [DOI](https://doi.org/10.1016/j.ijforecast.2023.04.003)
 
-Zambon, L., Azzimonti, D. & Corani, G. (2022). *Efficient probabilistic
+Zambon, L., Azzimonti, D. & Corani, G. (2024). *Efficient probabilistic
 reconciliation of forecasts for real-valued and count time series*.
-[DOI](https://doi.org/10.48550/arXiv.2210.02286)
+[DOI](https://doi.org/10.1007/s11222-023-10343-y)
 
 Zambon, L., Agosto, A., Giudici, P., Corani, G. (2023). *Properties of
 the reconciled distributions for Gaussian and count forecasts*.

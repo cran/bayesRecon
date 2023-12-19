@@ -1,4 +1,4 @@
-#' Carpart time series
+#' Example of a time series from carparts 
 #'
 #' A monthly time series from the `carparts` dataset, 51 observations, Jan 1998 - Mar 2002.
 #'
@@ -13,4 +13,4 @@
 #' 
 #' @source 
 #' Godahewa, Rakshitha, Bergmeir, Christoph, Webb, Geoff, Hyndman, Rob, & Montero-Manso, Pablo. (2020). Car Parts Dataset (without Missing Values) (Version 2) \doi{10.5281/zenodo.4656021}
-"carpart"
+"carparts_example"

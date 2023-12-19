@@ -17,19 +17,19 @@ library(bayesRecon)
 
 ## ----carpart-plot, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 1**: Carpart - monthly car part sales.", fig.dim = c(6, 3)----
 layout(mat = matrix(c(1, 2), nrow = 1, ncol = 2), widths = c(2, 1))
-plot(carpart, xlab = "Time", ylab = "Car part sales", main = NULL)
-hist(carpart, xlab = "Car part sales", main = NULL)
+plot(carparts_example, xlab = "Time", ylab = "Car part sales", main = NULL)
+hist(carparts_example, xlab = "Car part sales", main = NULL)
 
 ## ----train-test---------------------------------------------------------------
-train <- window(carpart, end = c(2001, 3))
-test <- window(carpart, start = c(2001, 4))
+train <- window(carparts_example, end = c(2001, 3))
+test  <- window(carparts_example, start = c(2001, 4))
 
 ## ----temp-agg-----------------------------------------------------------------
 train.agg <- bayesRecon::temporal_aggregation(train, agg_levels = c(2, 3, 4, 6, 12))
 levels <- c("Annual", "Biannual", "4-Monthly", "Quarterly", "2-Monthly", "Monthly")
 names(train.agg) <- levels
 
-## ----temp-agg-plot, dpi=300, fig.show="hold", out.width="100%", out.heigth="100%", fig.align='center', fig.cap="**Figure 2**: Carpart - visualization of the aggregated time series.", fig.dim=c(6,3.5)----
+## ----temp-agg-plot, dpi=300, fig.show="hold", out.width="100%", out.heigth="100%", fig.align='center', fig.cap="**Figure 2**: The aggregated time series of the temporal hierarchy.", fig.dim=c(6,3.5)----
 par(mfrow = c(2, 3), mai = c(0.6, 0.6, 0.5, 0.5))
 for (l in levels) {
   plot(train.agg[[l]], xlab = "Time", ylab = "Car part sales", main = l)
@@ -42,6 +42,7 @@ for (l in levels) {
 fc.samples <- list()
 D <- 20000
 fc.count <- 1
+
 # iterating over the temporal aggregation levels
 for (l in seq_along(train.agg)) {
   f.level <- frequency(train.agg[[l]])
@@ -130,10 +131,10 @@ metrics
 
 
 ## ----m3-plot, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 3**: M3 - N1485 time series.", fig.dim = c(6, 3)----
-plot(M3example$train, xlab = "Time", ylab = "y", main = "N1485")
+plot(M3_example$train, xlab = "Time", ylab = "y", main = "N1485")
 
 ## ----m3-agg-------------------------------------------------------------------
-train.agg <- bayesRecon::temporal_aggregation(M3example$train)
+train.agg <- bayesRecon::temporal_aggregation(M3_example$train)
 levels <- c("Annual", "Biannual", "4-Monthly", "Quarterly", "2-Monthly", "Monthly")
 names(train.agg) <- levels
 
@@ -141,7 +142,7 @@ names(train.agg) <- levels
 # install.packages("forecast", dependencies = TRUE)
 library(forecast)
 
-H <- length(M3example$test)
+H <- length(M3_example$test)
 H
 
 fc <- list()
@@ -192,11 +193,11 @@ reconc.buis <- bayesRecon::reconc_BUIS(
 
 # check that the algorithms return consistent results
 round(rbind(
-  c(recon.gauss$upper_reconciled_mean, recon.gauss$bottom_reconciled_mean),
+  c(rmat$S %*% recon.gauss$bottom_reconciled_mean),
   rowMeans(reconc.buis$reconciled_samples)
 ))
 
-## ----m3-plotfore, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 5**: M3 - visualization of base and reconciled forecasts. The black line is the actual data (dashed is the test). The orange line is the forecasted mean, the blu line the reconciled mean. Shadow regions show the 95% prediction intervals.", fig.dim = c(6, 4)----
+## ----m3-plotfore, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 5**: M3 - Base and reconciled forecasts. The black line shows the actual data (dashed in the test). The orange line is the  mean of the base forecasts, the blu line is the reconciled mean. We also show the 95% prediction intervals.", fig.dim = c(6, 4)----
 yhat.mu <- tail(sapply(fc, "[[", 1), 18)
 yhat.sigma <- tail(sapply(fc, "[[", 2), 18)
 yhat.hi95 <- qnorm(0.975, mean = yhat.mu, sd = yhat.sigma)
@@ -207,17 +208,17 @@ yreconc.hi95 <- apply(reconc.buis$bottom_reconciled_samples, 1,
 yreconc.lo95 <- apply(reconc.buis$bottom_reconciled_samples, 1, 
                       function(x) quantile(x, 0.025))
 
-ylim_ <- c(min(M3example$train, M3example$test, yhat.lo95, yreconc.lo95) - 1, 
-           max(M3example$train, M3example$test, yhat.hi95, yreconc.hi95) + 1)
+ylim_ <- c(min(M3_example$train, M3_example$test, yhat.lo95, yreconc.lo95) - 1, 
+           max(M3_example$train, M3_example$test, yhat.hi95, yreconc.hi95) + 1)
 
-plot(M3example$train, xlim = c(1990, 1995.6), ylim = ylim_, 
+plot(M3_example$train, xlim = c(1990, 1995.6), ylim = ylim_, 
      ylab = "y", main = "N1485 Forecasts")
-lines(M3example$test, lty = "dashed")
-lines(ts(yhat.mu, start = start(M3example$test), frequency = 12), 
+lines(M3_example$test, lty = "dashed")
+lines(ts(yhat.mu, start = start(M3_example$test), frequency = 12), 
       col = "coral", lwd = 2)
-lines(ts(yreconc.mu, start = start(M3example$test), frequency = 12), 
+lines(ts(yreconc.mu, start = start(M3_example$test), frequency = 12), 
       col = "blue2", lwd = 2)
-xtest <- time(M3example$test)
+xtest <- time(M3_example$test)
 polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.hi95)), 
         col = "#FF7F5066", border = "#FF7F5066")
 polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.lo95)), 
@@ -285,6 +286,12 @@ recon.gauss <- bayesRecon::reconc_gaussian(S,
                                            base_forecasts.mu = mu,
                                            base_forecasts.Sigma = Sigma)
 
-# check coherence
-(A %*% recon.gauss$bottom_reconciled_mean) - recon.gauss$upper_reconciled_mean
+bottom_mu_reconc <- recon.gauss$bottom_reconciled_mean
+bottom_Sigma_reconc <- recon.gauss$bottom_reconciled_covariance
+
+# Obtain reconciled mu and Sigma for the upper variable
+upper_mu_reconc <- A %*% bottom_mu_reconc
+upper_Sigma_reconc <- A %*% bottom_Sigma_reconc %*% t(A)
+
+upper_mu_reconc
 

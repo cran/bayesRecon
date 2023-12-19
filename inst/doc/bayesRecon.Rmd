@@ -1,7 +1,7 @@
 ---
 title: "Probabilistic Reconciliation via Conditioning with `bayesRecon`"
 author: "Nicolò Rubattu, Giorgio Corani, Dario Azzimonti, Lorenzo Zambon"
-date: "2023-07-26"
+date: "2023-11-26"
 lang: "en"
 output: html_vignette
 bibliography: references.bib
@@ -31,53 +31,49 @@ klippy::klippy(position = c('top', 'right'), tooltip_message = 'Copy', tooltip_s
 
 # Introduction
 
-This vignette shows how to use the `bayesRecon` package for the *probabilistic reconciliation* of hierarchical forecasts. We provide three examples:
+This vignette shows how to perform  *probabilistic reconciliation* with
+the `bayesRecon` package. We provide three examples:
 
-1. **Carpart**: we build a temporal hierarchy on a count time series and we reconcile it via the Bottom-Up Importance Sampling (BUIS)  algorithm.
+1. *Temporal hierarchy for a count time series*: we build a temporal hierarchy over a count time series,  produce the base forecasts using `glarma` and  reconcile them via Bottom-Up Importance Sampling (BUIS).
 
-2. **M3**: we build a temporal hierarchy on a smooth time series and we reconcile it using Gaussian reconciliation.
+2.  *Temporal hierarchy for a smooth time series*: we build a temporal hierarchy over a smooth time series,  compute the base forecasts using `ets` and  we reconcile them in closed form using Gaussian reconciliation. The covariance matrix is diagonal.
 
-3. **Infants mortality**: we reconcile cross-sectional forecasts.
+3.   *Hierarchical of smooth time series*: this is an example of a cross-sectional hierarchy. We generate the base forecasts using `ets` and we reconcile them via Gaussian reconciliation.
+The covariance matrix is full and estimated via shrinkage.
 
-The implemented reconciliation algorithms are discussed in:
 
-* Zambon, L., Azzimonti, D., & Corani, G. (2022). Efficient probabilistic reconciliation of forecasts for real-valued and count time series.
 
-* Zambon, L., Agosto, A., Giudici, P., & Corani, G. (2023). Properties of the reconciled distributions for Gaussian and count forecasts.
+# Installation
 
-* Corani, G., Azzimonti, D., & Rubattu, N. (2023). Probabilistic reconciliation of count time series.
-
-* Corani, G., Azzimonti, D., Augusto, J. P., & Zaffalon, M. (2021). Probabilistic reconciliation of hierarchical forecast via Bayes' rule.
-
-# Setup
-
-You can install the stable version of `bayesRecon` on [R CRAN](https://cran.r-project.org/package=bayesRecon).
-
+The package, available at this 
+[CRAN page](https://cran.r-project.org/package=bayesRecon), can be installed and loaded with the usual commands:
 ```{r install, eval=FALSE}
 install.packages('bayesRecon', dependencies = TRUE)
 ```
 
-Load the package.
+Load the package:
+
 ```{r load}
 library(bayesRecon)
 ```
 
-# Example 1: Carpart
-In this example, we consider a *monthly* time series of car part sales, from Jan. 1998 to Mar. 2002. \
-This is actually the time series #2655 of the *carparts* dataset [@hyndman2008forecasting]. It is available from `bayesRecon::carpart`.
+# Temporal hierarchy over a count time series
+We select a monthly time series of counts from  the *carparts* dataset, available from
+the expsmooth package [@expsmooth_pkg].
+The data set contains time series of sales of cars part from Jan. 1998 to Mar. 2002. 
+For this example we select time series #2655, which we make  available  as `bayesRecon::carparts_example`.
 
-The time series consists of **count** data, and the distribution of its values is skewed. Hence, we  produce base forecasts using a method specialized for  count time series.
-
+This time series  has a skewed distribution of  values. 
 ```{r carpart-plot, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 1**: Carpart - monthly car part sales.", fig.dim = c(6, 3)}
 layout(mat = matrix(c(1, 2), nrow = 1, ncol = 2), widths = c(2, 1))
-plot(carpart, xlab = "Time", ylab = "Car part sales", main = NULL)
-hist(carpart, xlab = "Car part sales", main = NULL)
+plot(carparts_example, xlab = "Time", ylab = "Car part sales", main = NULL)
+hist(carparts_example, xlab = "Car part sales", main = NULL)
 ```
 <br><br>
-We divide the time series into train and test;  we want to forecast the test set, i.e., the last 12 observations (1 year ahead).
+We divide the time series into train and test; the test set contains  the last 12 months.
 ```{r train-test}
-train <- window(carpart, end = c(2001, 3))
-test <- window(carpart, start = c(2001, 4))
+train <- window(carparts_example, end = c(2001, 3))
+test  <- window(carparts_example, start = c(2001, 4))
 ```
 
 <!-- In order to do hierarchical forecasting: -->
@@ -85,9 +81,10 @@ test <- window(carpart, start = c(2001, 4))
 <!-- 1.    we build a temporal hierarchy; -->
 <!-- 2.    we compute the *base forecasts*) at each temporal scale. -->
 
-We now build the temporal hierarchy and compute the *base forecasts*.
-
-We build the hierarchy using the `temporal aggregation` function. We aggregate at *2-Monthly*, *Quarterly*, *4-Monthly*, *Biannual*, and *Annual* by specifying the `agg_levels` argument.
+We build the temporal hierarchy using the `temporal aggregation` function.
+We specify the aggregation levels using the 
+`agg_levels` argument; in this case they are
+*2-Monthly*, *Quarterly*, *4-Monthly*, *Biannual*, and *Annual*.
 
 ``` {r temp-agg}
 train.agg <- bayesRecon::temporal_aggregation(train, agg_levels = c(2, 3, 4, 6, 12))
@@ -95,31 +92,24 @@ levels <- c("Annual", "Biannual", "4-Monthly", "Quarterly", "2-Monthly", "Monthl
 names(train.agg) <- levels
 ```
 
-The function returns a list of aggregated time series, ordered from the top (most aggregated) to the bottom (most disagreggated).
-``` {r temp-agg-plot, dpi=300, fig.show="hold", out.width="100%", out.heigth="100%", fig.align='center', fig.cap="**Figure 2**: Carpart - visualization of the aggregated time series.", fig.dim=c(6,3.5)}
+The function returns a list of aggregated time series, ordered from the most aggregated (top of the hierarchy) to the most disagreggated (bottom of the hierarchy). We  plot them below.
+``` {r temp-agg-plot, dpi=300, fig.show="hold", out.width="100%", out.heigth="100%", fig.align='center', fig.cap="**Figure 2**: The aggregated time series of the temporal hierarchy.", fig.dim=c(6,3.5)}
 par(mfrow = c(2, 3), mai = c(0.6, 0.6, 0.5, 0.5))
 for (l in levels) {
   plot(train.agg[[l]], xlab = "Time", ylab = "Car part sales", main = l)
 }
 ```
 <br><br>
-We use the  `glarma` package ([R CRAN](https://cran.r-project.org/package=glarma)) to generate the  forecasts. This package is specialized in forecasting count time series and it is based on
-a Generalized Linear Autoregressive Moving Average model.
-In this example, we adopt a Poisson predictive distribution.
+We  compute the  *base forecasts* using the package  [`glarma`](https://cran.r-project.org/package=glarma),
+a package specific for forecasting count time series.
+We forecast 12 steps ahead at the monthly level,  4 steps ahead  at the quarterly level, etc. by iterating over the levels of the  hierarchy,
+At each level, we fit a `glarma` model
+with Poisson predictive distribution and we forecast;
+each forecast is constituted by 20000  integer samples.
 
-The models produce forecasts for 1 year ahead;
-<!-- *h* steps ahead according to the temporal level. -->
-this is *h=12* steps ahead for the monthly level,  *h=4* steps ahead  for the quarterly level, etc.
-Each forecast is constituted by $D$ integer samples;
-we set $D=20000$.
 
-Below we use a for loop to iterate over the levels of the temporal hierarchy.
-For each level, we fit an independent model; then  we obtain 
-the  samples of the forecasts using the function `glarma::forecast.glarma`.
-Overall we have 28 predictive distributions (one for *Annual*, two for *Biannual*, etc.).
-We collect the samples of the 28 distributions in a list.
-
-The following lines of code take ~ 30 seconds on a personal computer.
+Eventually we collect the samples of the  28 predictive distributions (one at the  *Annual* level, two at the *Biannual* level, etc.) in a list.
+The  code below takes about 30 seconds on a standard computer.
 
 ``` {r hier-fore, cache=TRUE}
 # install.packages("glarma", dependencies = TRUE)
@@ -128,6 +118,7 @@ The following lines of code take ~ 30 seconds on a personal computer.
 fc.samples <- list()
 D <- 20000
 fc.count <- 1
+
 # iterating over the temporal aggregation levels
 for (l in seq_along(train.agg)) {
   f.level <- frequency(train.agg[[l]])
@@ -163,13 +154,11 @@ for (l in seq_along(train.agg)) {
 ```
 
 
-Base forecasts do not sum up correctly. In order to address incoherence we can now use a reconciliation algorithm.
-
-First, we obtain the summing matrix $\mathbf{S}$ using the function `get_reconc_matrices`. 
+Reconciliation requires the summing matrix $\mathbf{S}$, which we obtain using the function `get_reconc_matrices`. 
 It requires: 
 
-*   the aggregation factors used before to build the hierarchy, $\{2, 3, 4, 6, 12\}$ in this example;
-*   the length of the forecasting horizon for the bottom time series (*h=12* in this example).
+*   the aggregation factors of the hierarchy, which in this example are $\{2, 3, 4, 6, 12\}$;
+*   the length of the forecasting horizon at the  bottom level, which is 12 in this example.
 
 ``` {r S}
 recon.matrices <- bayesRecon::get_reconc_matrices(agg_levels = c(2, 3, 4, 6, 12), h = 12)
@@ -179,10 +168,10 @@ S <- recon.matrices$S
 A <- recon.matrices$A 
 ```
 
-Then, we use the function `reconc_BUIS` which implements the Bottom-Up Important Sampling (BUIS) algorithm.
-It requires the $\mathbf{S}$ matrix, the *base forecasts*, the  type of the base forecasts ("samples" in this example) and the specification of the base forecasts distributions ("discrete" in this example, since the predictive distributions are Poisson).
+To reconcile using Bottom-Up Important Sampling (BUIS) we
+we use the function `reconc_BUIS`, passing to it
+the $\mathbf{S}$ matrix, the *base forecasts*, the  type  of the base forecasts (`in_type`="samples") and whether the samples are discrete or integer (`distr` = "discrete").
 
-The `in_type` argument is a string with two possible values: "samples" if the base forecasts are in the form of samples, "params" if the base forecasts are in the form of estimated parameters. The `distr` argument is a string describing the type of base forecasts. It can be: "continuous" or "discrete" if `in_type = "samples"`; "gaussian", "poisson" or "nbinom" if `in_type = "params"`. 
 
 ``` {r reconc}
 recon.res <- bayesRecon::reconc_BUIS(
@@ -193,14 +182,15 @@ recon.res <- bayesRecon::reconc_BUIS(
   seed = 42
 )
 ```
-The function returns samples from the  *reconciled forecast distribution*.
+
+Here we obtain samples from the reconciled forecast distribution.
 ```{r res}
 reconciled_samples <- recon.res$reconciled_samples
 dim(reconciled_samples)
 
 ```
 
-We now compute the Mean Absolute Error (MAE) and the Continuous Ranked Probability Score (CRPS) for the bottom (i.e., *monthly*) time series.  For CRPS, we use `crps_sample` from the package `scoringRules` ([R CRAN](https://cran.r-project.org/package=scoringRules)).
+We now compute the Mean Absolute Error (MAE) and the Continuous Ranked Probability Score (CRPS) for the bottom (i.e., *monthly*) time series.  For computing CRPS, we use the package [`scoringRules`](https://cran.r-project.org/package=scoringRules).
 
 ```{r metrics}
 # install.packages("scoringRules", dependencies = TRUE)
@@ -236,36 +226,36 @@ metrics
 
 ```
 
-Note the improvements with respect to the base forecast on both MAE and CRPS metrics.
 
-# Example 2: M3
+# Temporal hierarchy over a smooth time series
 
-We now consider a *monthly* time series (N1485) from the M3 forecasting competition [@makridakis2000m3].
-It is available from `bayesRecon::M3sample`.
+In this second example, we select a smooth monthly time series (N1485) from the M3 forecasting competition [@makridakis2000m3]. The data set is available in
+the Mcomp package [@mcomp_pkg] and we make available this time series as `bayesRecon::m3_example`.
+
 
 ```{r m3-plot, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 3**: M3 - N1485 time series.", fig.dim = c(6, 3)}
-plot(M3example$train, xlab = "Time", ylab = "y", main = "N1485")
+plot(M3_example$train, xlab = "Time", ylab = "y", main = "N1485")
 ```
 <br>
-We build the temporal hierarchy using the `temporal_aggregation` function. We aggregate at *2-Monthly*, *Quarterly*, *4-Monthly*, *Biannual*, and *Annual*. As we do not specify the `agg_levels` argument, the function generates
-all the factors of the time series frequency  (i.e. `frequency(M3example$train)` ).
+We build the temporal hierarchy using the `temporal_aggregation` function. 
+
+Without specifying  `agg_levels`, the function  generates by default all the feasible aggregation: 2-Monthly, Quarterly, 4-Monthly, Biannual, and Annual.
 
 ```{r m3-agg} 
-train.agg <- bayesRecon::temporal_aggregation(M3example$train)
+train.agg <- bayesRecon::temporal_aggregation(M3_example$train)
 levels <- c("Annual", "Biannual", "4-Monthly", "Quarterly", "2-Monthly", "Monthly")
 names(train.agg) <- levels
 ```
 
 
-We use  the ets models from  `forecast` ([R CRAN](https://cran.r-project.org/package=forecast)) to generate forecast  for each temporal level, for each *h*. 
-The predictive distribution is  Gaussian and we predict
-the next 18 months (the value of *h* is different for each temporal level). 
-
+We generate the base forecasts using `ets` from the   [forecast](https://cran.r-project.org/package=forecast) package [@pkg_forecast].
+At every level we predict 18 months ahead.
+All the  predictive distributions are Gaussian.
 ```{r m3-fore}
 # install.packages("forecast", dependencies = TRUE)
 library(forecast)
 
-H <- length(M3example$test)
+H <- length(M3_example$test)
 H
 
 fc <- list()
@@ -289,8 +279,7 @@ for (level in train.agg) {
 }
 ```
 
-
-Before reconciling the forecasts,  we obtain the matrix $\mathbf{S}$ using the function `get_reconc_matrices`.
+Using the function `get_reconc_matrices`,  we get  matrix $\mathbf{S}$.
 
 ```{r m3-rmat, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 4**: M3 - The aggregating matrix A (red=1, yellow=0).", fig.dim = c(8, 8)}
 rmat <- get_reconc_matrices(agg_levels = c(2, 3, 4, 6, 12), h = 18)
@@ -303,9 +292,10 @@ axis(1, at=1:ncol(rmat$A), label=1:ncol(rmat$A), las=1)
 axis(2, at=c(23,22,19,15,9), label=levels[1:5], las=2)
 ```
 <br>
-We now use the function `reconc_gaussian` which implements the closed-form Gaussian reconciliation,
-and the function `reconc_BUIS` which implements the Bottom-Up Important Sampling (BUIS) algorithm. 
-We can check that the algorithms return consistent results, apart from minor numerical differences due to the sampling randomness of BUIS, which get smaller as we increase the `num_samples` argument of `reconc_BUIS`.
+The function `reconc_gaussian`  implements the exact Gaussian reconciliation.
+We also run `reconc_BUIS`, to check the consistency 
+between the two approaches.
+
 
 ```{r m3-reco} 
 recon.gauss <- bayesRecon::reconc_gaussian(
@@ -325,14 +315,14 @@ reconc.buis <- bayesRecon::reconc_BUIS(
 
 # check that the algorithms return consistent results
 round(rbind(
-  c(recon.gauss$upper_reconciled_mean, recon.gauss$bottom_reconciled_mean),
+  c(rmat$S %*% recon.gauss$bottom_reconciled_mean),
   rowMeans(reconc.buis$reconciled_samples)
 ))
 ```
 
-We now show the *base forecasts* and the *reconciled forecasts*.
+We now compare  *base forecasts* and  *reconciled forecasts*:
 
-```{r m3-plotfore, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 5**: M3 - visualization of base and reconciled forecasts. The black line is the actual data (dashed is the test). The orange line is the forecasted mean, the blu line the reconciled mean. Shadow regions show the 95% prediction intervals.", fig.dim = c(6, 4)}
+```{r m3-plotfore, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 5**: M3 - Base and reconciled forecasts. The black line shows the actual data (dashed in the test). The orange line is the  mean of the base forecasts, the blu line is the reconciled mean. We also show the 95% prediction intervals.", fig.dim = c(6, 4)}
 yhat.mu <- tail(sapply(fc, "[[", 1), 18)
 yhat.sigma <- tail(sapply(fc, "[[", 2), 18)
 yhat.hi95 <- qnorm(0.975, mean = yhat.mu, sd = yhat.sigma)
@@ -343,17 +333,17 @@ yreconc.hi95 <- apply(reconc.buis$bottom_reconciled_samples, 1,
 yreconc.lo95 <- apply(reconc.buis$bottom_reconciled_samples, 1, 
                       function(x) quantile(x, 0.025))
 
-ylim_ <- c(min(M3example$train, M3example$test, yhat.lo95, yreconc.lo95) - 1, 
-           max(M3example$train, M3example$test, yhat.hi95, yreconc.hi95) + 1)
+ylim_ <- c(min(M3_example$train, M3_example$test, yhat.lo95, yreconc.lo95) - 1, 
+           max(M3_example$train, M3_example$test, yhat.hi95, yreconc.hi95) + 1)
 
-plot(M3example$train, xlim = c(1990, 1995.6), ylim = ylim_, 
+plot(M3_example$train, xlim = c(1990, 1995.6), ylim = ylim_, 
      ylab = "y", main = "N1485 Forecasts")
-lines(M3example$test, lty = "dashed")
-lines(ts(yhat.mu, start = start(M3example$test), frequency = 12), 
+lines(M3_example$test, lty = "dashed")
+lines(ts(yhat.mu, start = start(M3_example$test), frequency = 12), 
       col = "coral", lwd = 2)
-lines(ts(yreconc.mu, start = start(M3example$test), frequency = 12), 
+lines(ts(yreconc.mu, start = start(M3_example$test), frequency = 12), 
       col = "blue2", lwd = 2)
-xtest <- time(M3example$test)
+xtest <- time(M3_example$test)
 polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.hi95)), 
         col = "#FF7F5066", border = "#FF7F5066")
 polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.lo95)), 
@@ -364,17 +354,20 @@ polygon(c(xtest, rev(xtest)), c(yreconc.mu, rev(yreconc.lo95)),
         col = "#0000EE4D", border = "#0000EE4D")
 ```
 
-# Example 3: Infants mortality
 
-In this example, we consider the *infantgts* hierarchical time series [@hyndman2011optimal].
-It is available via `bayesRecon::infantMortality`.
 
-It is a *yearly* grouped **cross-sectional** time series dataset, from 1901 to 2003, of infant mortality counts (deaths) in Australia, disaggregated by state and sex (male and female). 
-State codes refer to: New South Wales (NSW), Victoria (VIC), Queensland (QLD), South Australia (SA), Western Australia (WA), Northern Territory (NT), Australian Capital Territory (ACT), and Tasmania (TAS).
+#   Gaussian reconciliation of a cross-sectional hierarchy
 
-We want to forecast the next year, 2004. We use the auto.arima forecasting models from the package `forecast` ([R CRAN](https://cran.r-project.org/package=forecast)) to generate Gaussian predictions for each node of the hierarchy. 
+In this example, we consider the hierarchical time series *infantgts*, which is available 
+from the `hts` package [@hts_pkg]
+We make it available also in our package as `bayesRecon::infantMortality`.
 
-For each model, we collect the residuals to take into account correlations. 
+It contains counts of infant mortality (deaths) in Australia, disaggregated by state and sex (male and female). 
+
+<!-- State codes refer to: New South Wales (NSW), Victoria (VIC), Queensland (QLD), South Australia (SA), Western Australia (WA), Northern Territory (NT), Australian Capital Territory (ACT), and Tasmania (TAS). -->
+
+We forecast one year ahead using `auto.arima`  from the [`forecast` ](https://cran.r-project.org/package=forecast) package. 
+We collect the residuals, which we will later use to compute the covariance matrix. 
 
 ```{r infants-forecasts}
 # install.packages("forecast", dependencies = TRUE)
@@ -399,7 +392,7 @@ for (s in infantMortality) {
 }
 ```
 
-Build the $\mathbf{S}$ matrix.
+Now we build the $\mathbf{S}$ matrix.
 
 ```{r infants-s, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 6**: Infants mortality - The aggregating matrix A (red=1, yellow=0).", fig.dim = c(8, 8)}
 # we have 16 bottom time series, and 11 upper time series
@@ -425,18 +418,7 @@ axis(1, at=1:ncol(A), label=names(infantMortality)[12:27], las=2)
 axis(2, at=c(1:11), label=rev(names(infantMortality)[1:11]), las=2)
 ```
 <br>
-
-We can now use Gaussian reconciliation, to ensure *coherent* forecasts. 
-
-We require an estimate of the covariance of the base forecasts. We can estimate it 
-with the sample covariance of the in-sample errors. However, this is often 
-a poor estimate due to the high variance, especially when the number of series in the hierarchy
-is larger than the length of the series. @wickramasuriya2019optimal proposed an estimator 
-of the covariance that shrinks the off-diagonal elements towards 0.
-
-The function `bayesRecon::schaferStrimmer_cov` implements this estimator by following 
-@schafer2005shrinkage to compute the optimal
-shrinkage intensity.
+We use  `bayesRecon::schaferStrimmer_cov` to estimate the covariance matrix of the residuals with shrinkage [@schafer2005shrinkage].
 
 ```{r infants reconc}
 # means
@@ -447,15 +429,21 @@ print(paste("The estimated shrinkage intensity is", round(shrink.res$lambda_star
 Sigma <- shrink.res$shrink_cov
 ```
 
-The function `reconc_gaussian` implements the closed-form Gaussian reconciliation. It requires the covariance matrix and the vector of means.
+We now perform Gaussian reconciliation:
 
 ```{r infants-recon}
 recon.gauss <- bayesRecon::reconc_gaussian(S,
                                            base_forecasts.mu = mu,
                                            base_forecasts.Sigma = Sigma)
 
-# check coherence
-(A %*% recon.gauss$bottom_reconciled_mean) - recon.gauss$upper_reconciled_mean
+bottom_mu_reconc <- recon.gauss$bottom_reconciled_mean
+bottom_Sigma_reconc <- recon.gauss$bottom_reconciled_covariance
+
+# Obtain reconciled mu and Sigma for the upper variable
+upper_mu_reconc <- A %*% bottom_mu_reconc
+upper_Sigma_reconc <- A %*% bottom_Sigma_reconc %*% t(A)
+
+upper_mu_reconc
 ```
 
 # References
