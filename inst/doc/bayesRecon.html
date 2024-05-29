@@ -368,6 +368,7 @@ Lorenzo Zambon</h4>
 
 
 
+<p>bayesRecon.R</p>
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
 <p>This vignette shows how to perform <em>probabilistic
@@ -393,8 +394,10 @@ covariance matrix is full and estimated via shrinkage.</p></li>
 <p>The package, available at this <a href="https://cran.r-project.org/package=bayesRecon">CRAN page</a>, can
 be installed and loaded with the usual commands:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&#39;bayesRecon&#39;</span>, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>Load the package:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(bayesRecon)</span></code></pre></div>
+<p>bayesRecon.R</p>
 </div>
 <div id="temporal-hierarchy-over-a-count-time-series" class="section level1">
 <h1>Temporal hierarchy over a count time series</h1>
@@ -414,10 +417,11 @@ series #2655, which we make available as
 <strong>Figure 1</strong>: Carpart - monthly car part sales.
 </p>
 </div>
-<p><br><br> We divide the time series into train and test; the test set
-contains the last 12 months.</p>
+<p>bayesRecon.R <br><br> We divide the time series into train and test;
+the test set contains the last 12 months.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">window</span>(carparts_example, <span class="at">end =</span> <span class="fu">c</span>(<span class="dv">2001</span>, <span class="dv">3</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>test  <span class="ot">&lt;-</span> <span class="fu">window</span>(carparts_example, <span class="at">start =</span> <span class="fu">c</span>(<span class="dv">2001</span>, <span class="dv">4</span>))</span></code></pre></div>
+<p>bayesRecon.R</p>
 <!-- In order to do hierarchical forecasting: -->
 <!-- 1.    we build a temporal hierarchy; -->
 <!-- 2.    we compute the *base forecasts*) at each temporal scale. -->
@@ -429,6 +433,7 @@ levels using the <code>agg_levels</code> argument; in this case they are
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>train.agg <span class="ot">&lt;-</span> bayesRecon<span class="sc">::</span><span class="fu">temporal_aggregation</span>(train, <span class="at">agg_levels =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">12</span>))</span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Annual&quot;</span>, <span class="st">&quot;Biannual&quot;</span>, <span class="st">&quot;4-Monthly&quot;</span>, <span class="st">&quot;Quarterly&quot;</span>, <span class="st">&quot;2-Monthly&quot;</span>, <span class="st">&quot;Monthly&quot;</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">names</span>(train.agg) <span class="ot">&lt;-</span> levels</span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>The function returns a list of aggregated time series, ordered from
 the most aggregated (top of the hierarchy) to the most disagreggated
 (bottom of the hierarchy). We plot them below.</p>
@@ -443,7 +448,8 @@ the most aggregated (top of the hierarchy) to the most disagreggated
 hierarchy.
 </p>
 </div>
-<p><br><br> We compute the <em>base forecasts</em> using the package <a href="https://cran.r-project.org/package=glarma"><code>glarma</code></a>,
+<p>bayesRecon.R <br><br> We compute the <em>base forecasts</em> using
+the package <a href="https://cran.r-project.org/package=glarma"><code>glarma</code></a>,
 a package specific for forecasting count time series. We forecast 12
 steps ahead at the monthly level, 4 steps ahead at the quarterly level,
 etc. by iterating over the levels of the hierarchy, At each level, we
@@ -497,6 +503,7 @@ computer.</p>
 <span id="cb7-42"><a href="#cb7-42" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Quarterly...&quot;</span></span>
 <span id="cb7-43"><a href="#cb7-43" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at 2-Monthly...&quot;</span></span>
 <span id="cb7-44"><a href="#cb7-44" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Monthly...&quot;</span></span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>Reconciliation requires the summing matrix <span class="math inline">\(\mathbf{S}\)</span>, which we obtain using the
 function <code>get_reconc_matrices</code>. It requires:</p>
 <ul>
@@ -510,6 +517,7 @@ function <code>get_reconc_matrices</code>. It requires:</p>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>S <span class="ot">&lt;-</span> recon.matrices<span class="sc">$</span>S </span>
 <span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co"># A matrix</span></span>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>A <span class="ot">&lt;-</span> recon.matrices<span class="sc">$</span>A </span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>To reconcile using Bottom-Up Important Sampling (BUIS) we we use the
 function <code>reconc_BUIS</code>, passing to it the <span class="math inline">\(\mathbf{S}\)</span> matrix, the <em>base
 forecasts</em>, the type of the base forecasts
@@ -522,10 +530,12 @@ integer (<code>distr</code> = “discrete”).</p>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">distr =</span> <span class="st">&quot;discrete&quot;</span>,</span>
 <span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>  <span class="at">seed =</span> <span class="dv">42</span></span>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>)</span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>Here we obtain samples from the reconciled forecast distribution.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>reconciled_samples <span class="ot">&lt;-</span> recon.res<span class="sc">$</span>reconciled_samples</span>
 <span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">dim</span>(reconciled_samples)</span>
 <span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; [1]    28 20000</span></span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>We now compute the Mean Absolute Error (MAE) and the Continuous
 Ranked Probability Score (CRPS) for the bottom (i.e., <em>monthly</em>)
 time series. For computing CRPS, we use the package <a href="https://cran.r-project.org/package=scoringRules"><code>scoringRules</code></a>.</p>
@@ -562,6 +572,7 @@ time series. For computing CRPS, we use the package <a href="https://cran.r-proj
 <span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a><span class="co">#&gt;      base.forecasts reconciled.forecasts</span></span>
 <span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a><span class="co">#&gt; MAE       1.2500000            1.0416667</span></span>
 <span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a><span class="co">#&gt; CRPS      0.7093284            0.6840278</span></span></code></pre></div>
+<p>bayesRecon.R</p>
 </div>
 <div id="temporal-hierarchy-over-a-smooth-time-series" class="section level1">
 <h1>Temporal hierarchy over a smooth time series</h1>
@@ -577,7 +588,7 @@ available in the Mcomp package <span class="citation">(R. Hyndman
 <strong>Figure 3</strong>: M3 - N1485 time series.
 </p>
 </div>
-<p><br> We build the temporal hierarchy using the
+<p>bayesRecon.R <br> We build the temporal hierarchy using the
 <code>temporal_aggregation</code> function.</p>
 <p>Without specifying <code>agg_levels</code>, the function generates by
 default all the feasible aggregation: 2-Monthly, Quarterly, 4-Monthly,
@@ -585,6 +596,7 @@ Biannual, and Annual.</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>train.agg <span class="ot">&lt;-</span> bayesRecon<span class="sc">::</span><span class="fu">temporal_aggregation</span>(M3_example<span class="sc">$</span>train)</span>
 <span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>levels <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Annual&quot;</span>, <span class="st">&quot;Biannual&quot;</span>, <span class="st">&quot;4-Monthly&quot;</span>, <span class="st">&quot;Quarterly&quot;</span>, <span class="st">&quot;2-Monthly&quot;</span>, <span class="st">&quot;Monthly&quot;</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="fu">names</span>(train.agg) <span class="ot">&lt;-</span> levels</span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>We generate the base forecasts using <code>ets</code> from the <a href="https://cran.r-project.org/package=forecast">forecast</a> package
 <span class="citation">(R. J. Hyndman and Khandakar 2008)</span>. At
 every level we predict 18 months ahead. All the predictive distributions
@@ -612,8 +624,8 @@ are Gaussian.</p>
 <span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>  level.fc <span class="ot">&lt;-</span> <span class="fu">forecast</span>(model, <span class="at">h =</span> h)</span>
 <span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>  <span class="co"># save mean and sd of the gaussian predictive distribution</span></span>
 <span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h) {</span>
-<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>    fc[[fc.idx]] <span class="ot">&lt;-</span> <span class="fu">c</span>(level.fc<span class="sc">$</span>mean[[i]],</span>
-<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>                      (level.fc<span class="sc">$</span>upper[, <span class="st">&quot;95%&quot;</span>][[i]] <span class="sc">-</span> level.fc<span class="sc">$</span>mean[[i]]) <span class="sc">/</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>))</span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>    fc[[fc.idx]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">mean =</span> level.fc<span class="sc">$</span>mean[[i]],</span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>                         <span class="at">sd =</span> (level.fc<span class="sc">$</span>upper[, <span class="st">&quot;95%&quot;</span>][[i]] <span class="sc">-</span> level.fc<span class="sc">$</span>mean[[i]]) <span class="sc">/</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>))</span>
 <span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a>    fc.idx <span class="ot">&lt;-</span> fc.idx <span class="sc">+</span> <span class="dv">1</span></span>
 <span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a>  }</span>
 <span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a>  level.idx <span class="ot">&lt;-</span> level.idx <span class="sc">+</span> <span class="dv">1</span></span>
@@ -624,6 +636,7 @@ are Gaussian.</p>
 <span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Quarterly, h=6...&quot;</span></span>
 <span id="cb14-34"><a href="#cb14-34" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at 2-Monthly, h=9...&quot;</span></span>
 <span id="cb14-35"><a href="#cb14-35" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Monthly, h=18...&quot;</span></span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>Using the function <code>get_reconc_matrices</code>, we get matrix
 <span class="math inline">\(\mathbf{S}\)</span>.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>rmat <span class="ot">&lt;-</span> <span class="fu">get_reconc_matrices</span>(<span class="at">agg_levels =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">12</span>), <span class="at">h =</span> <span class="dv">18</span>)</span>
@@ -641,9 +654,10 @@ are Gaussian.</p>
 yellow=0).
 </p>
 </div>
-<p><br> The function <code>reconc_gaussian</code> implements the exact
-Gaussian reconciliation. We also run <code>reconc_BUIS</code>, to check
-the consistency between the two approaches.</p>
+<p>bayesRecon.R <br> The function <code>reconc_gaussian</code>
+implements the exact Gaussian reconciliation. We also run
+<code>reconc_BUIS</code>, to check the consistency between the two
+approaches.</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>recon.gauss <span class="ot">&lt;-</span> bayesRecon<span class="sc">::</span><span class="fu">reconc_gaussian</span>(</span>
 <span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="at">S =</span> rmat<span class="sc">$</span>S,</span>
 <span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">base_forecasts.mu =</span> <span class="fu">sapply</span>(fc, <span class="st">&quot;[[&quot;</span>, <span class="dv">1</span>),</span>
@@ -676,6 +690,7 @@ the consistency between the two approaches.</p>
 <span id="cb16-30"><a href="#cb16-30" tabindex="-1"></a><span class="co">#&gt;      [,37] [,38] [,39] [,40] [,41]</span></span>
 <span id="cb16-31"><a href="#cb16-31" tabindex="-1"></a><span class="co">#&gt; [1,]  6772  6881  6762  7160  7157</span></span>
 <span id="cb16-32"><a href="#cb16-32" tabindex="-1"></a><span class="co">#&gt; [2,]  6753  6943  6709  7152  7184</span></span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>We now compare <em>base forecasts</em> and <em>reconciled
 forecasts</em>:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>yhat.mu <span class="ot">&lt;-</span> <span class="fu">tail</span>(<span class="fu">sapply</span>(fc, <span class="st">&quot;[[&quot;</span>, <span class="dv">1</span>), <span class="dv">18</span>)</span>
@@ -716,6 +731,7 @@ mean of the base forecasts, the blu line is the reconciled mean. We also
 show the 95% prediction intervals.
 </p>
 </div>
+<p>bayesRecon.R</p>
 </div>
 <div id="gaussian-reconciliation-of-a-cross-sectional-hierarchy" class="section level1">
 <h1>Gaussian reconciliation of a cross-sectional hierarchy</h1>
@@ -777,6 +793,7 @@ the covariance matrix.</p>
 <span id="cb18-45"><a href="#cb18-45" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at ACT female...&quot;</span></span>
 <span id="cb18-46"><a href="#cb18-46" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at TAS male...&quot;</span></span>
 <span id="cb18-47"><a href="#cb18-47" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at TAS female...&quot;</span></span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>Now we build the <span class="math inline">\(\mathbf{S}\)</span>
 matrix.</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="co"># we have 16 bottom time series, and 11 upper time series</span></span>
@@ -807,8 +824,8 @@ matrix.</p>
 (red=1, yellow=0).
 </p>
 </div>
-<p><br> We use <code>bayesRecon::schaferStrimmer_cov</code> to estimate
-the covariance matrix of the residuals with shrinkage <span class="citation">(Schäfer and Strimmer 2005)</span>.</p>
+<p>bayesRecon.R <br> We use <code>bayesRecon::schaferStrimmer_cov</code>
+to estimate the covariance matrix of the residuals with shrinkage <span class="citation">(Schäfer and Strimmer 2005)</span>.</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="co"># means</span></span>
 <span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>mu <span class="ot">&lt;-</span> <span class="fu">sapply</span>(fc, <span class="st">&quot;[[&quot;</span>, <span class="dv">1</span>)</span>
 <span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="co"># Shrinkage covariance</span></span>
@@ -816,6 +833,7 @@ the covariance matrix of the residuals with shrinkage <span class="citation">(Sc
 <span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;The estimated shrinkage intensity is&quot;</span>, <span class="fu">round</span>(shrink.res<span class="sc">$</span>lambda_star, <span class="dv">3</span>)))</span>
 <span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;The estimated shrinkage intensity is 0.153&quot;</span></span>
 <span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a>Sigma <span class="ot">&lt;-</span> shrink.res<span class="sc">$</span>shrink_cov</span></code></pre></div>
+<p>bayesRecon.R</p>
 <p>We now perform Gaussian reconciliation:</p>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>recon.gauss <span class="ot">&lt;-</span> bayesRecon<span class="sc">::</span><span class="fu">reconc_gaussian</span>(S,</span>
 <span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>                                           <span class="at">base_forecasts.mu =</span> mu,</span>
@@ -841,6 +859,7 @@ the covariance matrix of the residuals with shrinkage <span class="citation">(Sc
 <span id="cb21-22"><a href="#cb21-22" tabindex="-1"></a><span class="co">#&gt;  [9,]  17.70948</span></span>
 <span id="cb21-23"><a href="#cb21-23" tabindex="-1"></a><span class="co">#&gt; [10,] 424.30288</span></span>
 <span id="cb21-24"><a href="#cb21-24" tabindex="-1"></a><span class="co">#&gt; [11,] 264.52121</span></span></code></pre></div>
+<p>bayesRecon.R</p>
 </div>
 <div id="references" class="section level1">
 <h1>References</h1>
@@ -851,12 +870,13 @@ Zaffalon. 2021. <span>“Probabilistic Reconciliation of Hierarchical
 Forecast via Bayes’ Rule.”</span> In <em>Machine Learning and Knowledge
 Discovery in Databases</em>, edited by Frank Hutter, Kristian Kersting,
 Jefrey Lijffijt, and Isabel Valera, 211–26. Springer International
-Publishing.
+Publishing. <a href="https://doi.org/10.1007/978-3-030-67664-3_13">https://doi.org/10.1007/978-3-030-67664-3_13</a>.
 </div>
 <div id="ref-corani2023probabilistic" class="csl-entry">
-Corani, Giorgio, Dario Azzimonti, and Nicolò Rubattu. 2023.
+Corani, Giorgio, Dario Azzimonti, and Nicolò Rubattu. 2024.
 <span>“Probabilistic Reconciliation of Count Time Series.”</span>
-<em>International Journal of Forecasting</em>.
+<em>International Journal of Forecasting</em> 40 (2): 457–69.
+https://doi.org/<a href="https://doi.org/10.1016/j.ijforecast.2023.04.003">https://doi.org/10.1016/j.ijforecast.2023.04.003</a>.
 </div>
 <div id="ref-mcomp_pkg" class="csl-entry">
 Hyndman, Rob. 2018. <em>Mcomp: Data from the m-Competitions</em>. <a href="https://CRAN.R-project.org/package=Mcomp">https://CRAN.R-project.org/package=Mcomp</a>.
@@ -884,11 +904,6 @@ Schäfer, Juliane, and Korbinian Strimmer. 2005. <span>“A Shrinkage
 Approach to Large-Scale Covariance Matrix Estimation and Implications
 for Functional Genomics.”</span> <em>Statistical Applications in
 Genetics and Molecular Biology</em> 4 (1).
-</div>
-<div id="ref-zambon2023properties" class="csl-entry">
-Zambon, Lorenzo, Arianna Agosto, Paolo Giudici, and Giorgio Corani.
-2023. <span>“Properties of the Reconciled Distributions for Gaussian and
-Count Forecasts.”</span> <em>arXiv Preprint arXiv:2303.15135</em>. <a href="https://doi.org/10.48550/arXiv.2303.15135">https://doi.org/10.48550/arXiv.2303.15135</a>.
 </div>
 <div id="ref-zambon2022efficient" class="csl-entry">
 Zambon, Lorenzo, Dario Azzimonti, and Giorgio Corani. 2024.

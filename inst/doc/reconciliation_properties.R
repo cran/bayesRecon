@@ -53,7 +53,7 @@ for (j in 1:N) {
   # Base forecasts:
   base_fc_j <- c()   
   for (i in 1:n) {
-    base_fc_j[[i]] <- c(base_fc$mu[[j,i]], base_fc$size[[i]])
+    base_fc_j[[i]] <- list(size = base_fc$size[[i]], mu = base_fc$mu[[j,i]])
   }
   
   # Reconcile via importance sampling:
@@ -132,8 +132,8 @@ N_samples <- 1e5
 ### Example of concordant-shift effect
 j <- 124
 base_fc_j <- c()   
-for (i in 1:n) base_fc_j[[i]] <- c(extr_mkt_events_basefc$mu[[j,i]], 
-                                   extr_mkt_events_basefc$size[[i]])
+for (i in 1:n) base_fc_j[[i]] <- list(size = extr_mkt_events_basefc$size[[i]],
+                                      mu = extr_mkt_events_basefc$mu[[j,i]])
 # Reconcile
 buis <- reconc_BUIS(S, base_fc_j, "params", "nbinom", 
                     num_samples = N_samples, seed = 42)
@@ -149,8 +149,8 @@ knitr::kable(matrix(means, nrow=1), col.names = col_names)
 ### Example of combination effect 
 j <- 1700
 base_fc_j <- c()   
-for (i in 1:n) base_fc_j[[i]] <- c(extr_mkt_events_basefc$mu[[j,i]], 
-                                   extr_mkt_events_basefc$size[[i]])
+for (i in 1:n) base_fc_j[[i]] <- list(size = extr_mkt_events_basefc$size[[i]],
+                                      mu = extr_mkt_events_basefc$mu[[j,i]])
 # Reconcile 
 buis <- reconc_BUIS(S, base_fc_j, "params", "nbinom", 
                     num_samples = N_samples, seed = 42)
@@ -166,8 +166,8 @@ knitr::kable(matrix(means, nrow=1), col.names = col_names)
 ## -----------------------------------------------------------------------------
 j <- 2308
 base_fc_j <- c()   
-for (i in 1:n) base_fc_j[[i]] <- c(extr_mkt_events_basefc$mu[[j,i]], 
-                                   extr_mkt_events_basefc$size[[i]])
+for (i in 1:n) base_fc_j[[i]] <- list(size = extr_mkt_events_basefc$size[[i]],
+                                      mu = extr_mkt_events_basefc$mu[[j,i]])
 # Reconcile
 buis <- reconc_BUIS(S, base_fc_j, "params", "nbinom", num_samples = N_samples, seed = 42)
 samples_y <- buis$reconciled_samples
