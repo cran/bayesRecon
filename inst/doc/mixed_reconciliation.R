@@ -16,9 +16,8 @@ n_b <- 3049
 n_u <- 11
 n <- n_b + n_u   
 
-# Load matrix A and S
+# Load matrix A 
 A <- M5_CA1_basefc$A
-S <- M5_CA1_basefc$S
 
 # Load base forecasts:
 base_fc_upper  <- M5_CA1_basefc$upper
@@ -58,7 +57,7 @@ base_forecasts.Sigma[(n_u+1):n,(n_u+1):n] <- Sigma_b
 ## -----------------------------------------------------------------------------
 # Gaussian reconciliation 
 start <- Sys.time()       
-gauss <- reconc_gaussian(S, base_forecasts.mu, base_forecasts.Sigma)
+gauss <- reconc_gaussian(A, base_forecasts.mu, base_forecasts.Sigma)
 stop <- Sys.time()
 
 rec_fc$Gauss <- list(mu_b    = gauss$bottom_reconciled_mean,
@@ -79,7 +78,7 @@ fc_bottom_4rec <- lapply(base_fc_bottom, "[[", "pmf")  # list of PMFs
 
 # MixCond reconciliation
 start <- Sys.time()       
-mix_cond <- reconc_MixCond(S, fc_bottom_4rec, fc_upper_4rec, bottom_in_type = "pmf",
+mix_cond <- reconc_MixCond(A, fc_bottom_4rec, fc_upper_4rec, bottom_in_type = "pmf",
                           num_samples = N_samples_IS, return_type = "pmf", seed = seed)
 stop <- Sys.time()       
 
@@ -97,7 +96,7 @@ N_samples_TD <- 1e4
 
 # TDcond reconciliation
 start <- Sys.time()     
-td <- reconc_TDcond(S, fc_bottom_4rec, fc_upper_4rec,
+td <- reconc_TDcond(A, fc_bottom_4rec, fc_upper_4rec,
                    bottom_in_type = "pmf", num_samples = N_samples_TD, 
                    return_type = "pmf", seed = seed)
 stop <- Sys.time()  

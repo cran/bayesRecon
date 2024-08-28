@@ -76,16 +76,14 @@ for (l in seq_along(train.agg)) {
 }
 
 
-## ----S------------------------------------------------------------------------
+## ----aggregationMatrix--------------------------------------------------------
 recon.matrices <- bayesRecon::get_reconc_matrices(agg_levels = c(2, 3, 4, 6, 12), h = 12)
-# Summing matrix
-S <- recon.matrices$S 
-# A matrix
+# Aggregation matrix
 A <- recon.matrices$A 
 
 ## ----reconc-------------------------------------------------------------------
 recon.res <- bayesRecon::reconc_BUIS(
-  S,
+  A,
   base_forecasts = fc.samples,
   in_type = "samples",
   distr = "discrete",
@@ -165,7 +163,7 @@ for (level in train.agg) {
   level.idx <- level.idx + 1
 }
 
-## ----m3-rmat, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 4**: M3 - The aggregating matrix A (red=1, yellow=0).", fig.dim = c(8, 8)----
+## ----m3-rmat, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 4**: M3 - The aggregation matrix A (red=1, yellow=0).", fig.dim = c(8, 8)----
 rmat <- get_reconc_matrices(agg_levels = c(2, 3, 4, 6, 12), h = 18)
 
 par(mai = c(1,1,0.5,0.5))
@@ -177,13 +175,13 @@ axis(2, at=c(23,22,19,15,9), label=levels[1:5], las=2)
 
 ## ----m3-reco------------------------------------------------------------------
 recon.gauss <- bayesRecon::reconc_gaussian(
-  S = rmat$S,
+  A = rmat$A,
   base_forecasts.mu = sapply(fc, "[[", 1),
   base_forecasts.Sigma = diag(sapply(fc, "[[", 2)) ^ 2
 )
 
 reconc.buis <- bayesRecon::reconc_BUIS(
-  S = rmat$S,
+  A = rmat$A,
   base_forecasts = fc,
   in_type = "params",
   distr = "gaussian",
@@ -250,7 +248,7 @@ for (s in infantMortality) {
   fc.idx <- fc.idx + 1
 }
 
-## ----infants-s, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 6**: Infants mortality - The aggregating matrix A (red=1, yellow=0).", fig.dim = c(8, 8)----
+## ----infants-s, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 6**: Infants mortality - The aggregation matrix A (red=1, yellow=0).", fig.dim = c(8, 8)----
 # we have 16 bottom time series, and 11 upper time series
 A <- matrix(data = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                      1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -263,7 +261,6 @@ A <- matrix(data = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
                      0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,
                      1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
                      0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1), byrow=TRUE, ncol = 16)
-S <- rbind(A, diag(16))
 
 # plot of A
 par(mai = c(1.5,1,0.5,0.5))
@@ -282,7 +279,7 @@ print(paste("The estimated shrinkage intensity is", round(shrink.res$lambda_star
 Sigma <- shrink.res$shrink_cov
 
 ## ----infants-recon------------------------------------------------------------
-recon.gauss <- bayesRecon::reconc_gaussian(S,
+recon.gauss <- bayesRecon::reconc_gaussian(A,
                                            base_forecasts.mu = mu,
                                            base_forecasts.Sigma = Sigma)
 
