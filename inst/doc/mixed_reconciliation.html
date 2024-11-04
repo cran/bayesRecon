@@ -465,7 +465,7 @@ bottom time series.</p>
 <span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a></span>
 <span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>Gauss_time <span class="ot">&lt;-</span> <span class="fu">as.double</span>(<span class="fu">round</span>(<span class="fu">difftime</span>(stop, start, <span class="at">units =</span> <span class="st">&quot;secs&quot;</span>), <span class="dv">2</span>))</span>
 <span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Time taken by Gaussian reconciliation: &quot;</span>, Gauss_time, <span class="st">&quot;s&quot;</span>)</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; Time taken by Gaussian reconciliation:  0.56 s</span></span></code></pre></div>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; Time taken by Gaussian reconciliation:  0.67 s</span></span></code></pre></div>
 </div>
 <div id="reconciliation-with-mixed-conditioning" class="section level1">
 <h1>Reconciliation with mixed-conditioning</h1>
@@ -508,7 +508,7 @@ The function parameter <code>return_type</code> can be changed to
 <span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a></span>
 <span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>MixCond_time <span class="ot">&lt;-</span> <span class="fu">as.double</span>(<span class="fu">round</span>(<span class="fu">difftime</span>(stop, start, <span class="at">units =</span> <span class="st">&quot;secs&quot;</span>), <span class="dv">2</span>))</span>
 <span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Computational time for Mix-cond reconciliation: &quot;</span>, MixCond_time, <span class="st">&quot;s&quot;</span>)</span>
-<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; Computational time for Mix-cond reconciliation:  12.18 s</span></span></code></pre></div>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; Computational time for Mix-cond reconciliation:  13.23 s</span></span></code></pre></div>
 <p>As discussed in <span class="citation">Zambon et al. (2024)</span>,
 Sect. 3, conditioning with mixed variables performs poorly in high
 dimensions. This is because the bottom-up distribution, built by
@@ -546,12 +546,12 @@ that this warning does not impact the performances of TD-cond.</p>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
 <span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>TDCond_time <span class="ot">&lt;-</span> <span class="fu">as.double</span>(<span class="fu">round</span>(<span class="fu">difftime</span>(stop, start, <span class="at">units =</span> <span class="st">&quot;secs&quot;</span>), <span class="dv">2</span>))</span>
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Computational time for TD-cond reconciliation: &quot;</span>, TDCond_time, <span class="st">&quot;s&quot;</span>)</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; Computational time for TD-cond reconciliation:  11 s</span></span></code></pre></div>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; Computational time for TD-cond reconciliation:  12.67 s</span></span></code></pre></div>
 </div>
 <div id="comparison" class="section level1">
 <h1>Comparison</h1>
 <p>The computational time required for the Gaussian reconciliation is
-0.56 seconds, Mix-cond requires 12.18 seconds and TD-cond requires 11
+0.67 seconds, Mix-cond requires 13.23 seconds and TD-cond requires 12.67
 seconds.</p>
 <p>For each time series in the hierarchy, we compute the following
 scores for each method:</p>

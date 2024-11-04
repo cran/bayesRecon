@@ -1,8 +1,8 @@
 Package: bayesRecon
 Type: Package
-Date: 2024-08-28
+Date: 2024-11-04
 Title: Probabilistic Reconciliation via Conditioning
-Version: 0.3.1
+Version: 0.3.2
 Authors@R: c(person(given = "Dario",
              family = "Azzimonti",
              role = c("aut","cre"),
@@ -43,11 +43,13 @@ Suggests: knitr, rmarkdown, forecast, glarma, scoringRules, testthat
         (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+URL: https://github.com/IDSIA/bayesRecon
+BugReports: https://github.com/IDSIA/bayesRecon/issues
 NeedsCompilation: no
-Packaged: 2024-08-28 16:07:11 UTC; dario.azzimonti
+Packaged: 2024-11-04 16:10:59 UTC; dario.azzimonti
 Author: Dario Azzimonti [aut, cre] (<https://orcid.org/0000-0001-5080-3061>),
   Nicolò Rubattu [aut] (<https://orcid.org/0000-0002-2703-1005>),
   Lorenzo Zambon [aut] (<https://orcid.org/0000-0002-8939-993X>),
   Giorgio Corani [aut] (<https://orcid.org/0000-0002-1541-8384>)
 Repository: CRAN
-Date/Publication: 2024-08-28 20:10:02 UTC
+Date/Publication: 2024-11-04 17:30:02 UTC

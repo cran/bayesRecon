@@ -468,7 +468,7 @@ the reconciled distribution.</p>
 <span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>stop <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Computational time for &quot;</span>, N, <span class="st">&quot; reconciliations: &quot;</span>,     </span>
 <span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">difftime</span>(stop, start, <span class="at">units =</span> <span class="st">&quot;secs&quot;</span>), <span class="dv">2</span>), <span class="st">&quot;s&quot;</span>)</span>
-<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; Computational time for  3508  reconciliations:  35.09 s</span></span></code></pre></div>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; Computational time for  3508  reconciliations:  37.55 s</span></span></code></pre></div>
 <p>We compute the median and the quantiles of the negative binomial base
 forecasts.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>base_means   <span class="ot">&lt;-</span> base_fc<span class="sc">$</span>mu</span>
