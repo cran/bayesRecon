@@ -7,10 +7,10 @@ knitr::opts_chunk$set(
 ## ----setup--------------------------------------------------------------------
 library(bayesRecon)
 
-## ----out.width = '100%', echo = FALSE-----------------------------------------
+## ----M5hier, fig.cap="**Figure 1**: graph of the M5 hierarchy.", out.width = '100%', echo = FALSE----
 knitr::include_graphics("img/M5store_hier.png")
 
-## -----------------------------------------------------------------------------
+## ----InitializeHierarchy------------------------------------------------------
 # Hierarchy composed by 3060 time series: 3049 bottom and 11 upper
 n_b <- 3049
 n_u <- 11
@@ -30,7 +30,7 @@ rec_fc <- list(
             TD_cond    = list()
           )
 
-## -----------------------------------------------------------------------------
+## ----readBaseForecasts--------------------------------------------------------
 # Parameters of the upper base forecast distributions
 mu_u <- unlist(lapply(base_fc_upper, "[[", "mu"))  # upper means
 # Compute the (shrinked) covariance matrix of the residuals
@@ -54,7 +54,7 @@ base_forecasts.Sigma <- matrix(0, nrow = n, ncol = n)
 base_forecasts.Sigma[1:n_u,1:n_u] <- Sigma_u
 base_forecasts.Sigma[(n_u+1):n,(n_u+1):n] <- Sigma_b
 
-## -----------------------------------------------------------------------------
+## ----GaussianReconciliation---------------------------------------------------
 # Gaussian reconciliation 
 start <- Sys.time()       
 gauss <- reconc_gaussian(A, base_forecasts.mu, base_forecasts.Sigma)
@@ -68,7 +68,7 @@ rec_fc$Gauss <- list(mu_b    = gauss$bottom_reconciled_mean,
 Gauss_time <- as.double(round(difftime(stop, start, units = "secs"), 2))
 cat("Time taken by Gaussian reconciliation: ", Gauss_time, "s")
 
-## -----------------------------------------------------------------------------
+## ----MixedCondReconciliation--------------------------------------------------
 seed <- 1
 N_samples_IS <- 5e4
 
@@ -91,7 +91,7 @@ rec_fc$Mixed_cond <- list(
 MixCond_time <- as.double(round(difftime(stop, start, units = "secs"), 2))
 cat("Computational time for Mix-cond reconciliation: ", MixCond_time, "s")
 
-## -----------------------------------------------------------------------------
+## ----TDcondReconciliation-----------------------------------------------------
 N_samples_TD <- 1e4
 
 # TDcond reconciliation
@@ -101,7 +101,7 @@ td <- reconc_TDcond(A, fc_bottom_4rec, fc_upper_4rec,
                    return_type = "pmf", seed = seed)
 stop <- Sys.time()  
 
-## -----------------------------------------------------------------------------
+## ----print computational time TD cond-----------------------------------------
 rec_fc$TD_cond <- list(
   bottom = td$bottom_reconciled$pmf,
   upper  = td$upper_reconciled$pmf
@@ -110,7 +110,7 @@ rec_fc$TD_cond <- list(
 TDCond_time <- as.double(round(difftime(stop, start, units = "secs"), 2))
 cat("Computational time for TD-cond reconciliation: ", TDCond_time, "s")
 
-## -----------------------------------------------------------------------------
+## ----InitializeMetrics--------------------------------------------------------
 # Parameters for computing the scores
 alpha <- 0.1   # MIS uses 90% coverage intervals
 jitt <- 1e-9   # jitter for numerical stability 
@@ -130,7 +130,7 @@ mase <- list()
 mis  <- list()
 rps  <- list()
 
-## ----include=FALSE------------------------------------------------------------
+## ----metricFunctions,include=FALSE--------------------------------------------
 # Functions for computing the scores of a PMF
 AE_pmf <- function(pmf, actual) {
   return(abs(PMF.get_quantile(pmf,p=0.5) - actual))
@@ -168,7 +168,7 @@ MIS_gauss <- function(mus, sds, actuals, alpha, trunc=FALSE) {
                  (2/alpha)*(actuals - u)*(actuals > u) )
 }
 
-## -----------------------------------------------------------------------------
+## ----computeScores------------------------------------------------------------
 # Compute scores for the base forecasts
 # Upper
 mu_u <- unlist(lapply(base_fc_upper, "[[", "mu"))
@@ -202,7 +202,7 @@ mase$TDcond <- mapply(AE_pmf, pmfs, actuals) / Q
 mis$TDcond  <- mapply(MIS_pmf, pmfs, actuals, MoreArgs = list(alpha=alpha))
 rps$TDcond  <- mapply(RPS_pmf, pmfs, actuals)
 
-## ----include=FALSE------------------------------------------------------------
+## ----skillScoreFunction,include=FALSE-----------------------------------------
 # Function for computing the skill score
 skill.score <- function(ref, met) {
   s <- (2 * (ref - met) / (ref + met)) * 100
@@ -210,7 +210,7 @@ skill.score <- function(ref, met) {
   return(s)
 }
 
-## -----------------------------------------------------------------------------
+## ----ComputeScores------------------------------------------------------------
 scores <- list(
         mase = mase,
         mis  = mis,
@@ -233,7 +233,7 @@ for (s in scores_) {
     }
 }
 
-## -----------------------------------------------------------------------------
+## ----AverageScores------------------------------------------------------------
 mean_skill_scores <- list()
 
 for (s in scores_) {
@@ -243,16 +243,16 @@ for (s in scores_) {
   rownames(mean_skill_scores[[s]]) <- c("upper","bottom")
 }
 
-## -----------------------------------------------------------------------------
+## ----printMASETable-----------------------------------------------------------
 knitr::kable(mean_skill_scores$mase,digits = 2,caption = "Mean skill score on MASE.",align = 'lccc')
 
-## -----------------------------------------------------------------------------
+## ----PrintMIStable------------------------------------------------------------
 knitr::kable(mean_skill_scores$mis,digits = 2,caption = "Mean skill score on MIS.")
 
-## -----------------------------------------------------------------------------
+## ----printRPStable------------------------------------------------------------
 knitr::kable(mean_skill_scores$rps,digits = 2,caption = "Mean skill score on RPS.")
 
-## ----fig.width=7,fig.height=8-------------------------------------------------
+## ----MASEboxplots, fig.cap="**Figure 2**: boxplot of MASE skill scores for upper and bottom time series.", fig.width=7,fig.height=8----
 custom_colors <- c("#a8a8e4", 
                   "#a9c7e4",
                   "#aae4df")
@@ -266,10 +266,10 @@ boxplot(skill_scores$mase$bottom, main = "MASE bottom time series",
         col = custom_colors, ylim = c(-200,200))
 abline(h=0,lty=3)
 
-## ----eval=TRUE,include=FALSE--------------------------------------------------
+## ----setupParams,eval=TRUE,include=FALSE--------------------------------------
 par(mfrow = c(1, 1))
 
-## ----fig.width=7,fig.height=8-------------------------------------------------
+## ----MISboxplots, fig.cap="**Figure 3**: boxplot of MIS skill scores for upper and bottom time series.", fig.width=7,fig.height=8----
 # Boxplots of MIS skill scores
 par(mfrow = c(2, 1))
 boxplot(skill_scores$mis$upper, main = "MIS upper time series", 
@@ -282,7 +282,7 @@ abline(h=0,lty=3)
 ## ----eval=TRUE,include=FALSE--------------------------------------------------
 par(mfrow = c(1, 1))
 
-## ----fig.width=7,fig.height=8-------------------------------------------------
+## ----RPSboxplots,fig.cap="**Figure 4**: boxplot of RPS skill scores for upper and bottom time series.", fig.width=7,fig.height=8----
 # Boxplots of RPS skill scores
 par(mfrow = c(2,1))
 boxplot(skill_scores$rps$upper, main = "RPS upper time series", 

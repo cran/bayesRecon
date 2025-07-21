@@ -7,7 +7,7 @@ knitr::opts_chunk$set(
 ## ----setup--------------------------------------------------------------------
 library(bayesRecon)
 
-## ----out.width = '50%', echo = FALSE------------------------------------------
+## ----finTShier, fig.cap="**Figure 1**: financial time series hierarchy.", out.width = '80%', echo = FALSE----
 knitr::include_graphics("img/finTS_hier.jpg")
 
 ## -----------------------------------------------------------------------------

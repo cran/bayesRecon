@@ -236,7 +236,8 @@
 #' @references
 #' Zambon, L., Azzimonti, D., Rubattu, N., Corani, G. (2024). 
 #' *Probabilistic reconciliation of mixed-type hierarchical time series*. 
-#' The 40th Conference on Uncertainty in Artificial Intelligence, accepted.
+#' Proceedings of the Fortieth Conference on Uncertainty in Artificial Intelligence,
+#' PMLR 244:4078-4095. <https://proceedings.mlr.press/v244/zambon24a.html>.
 #' 
 #' @seealso [reconc_MixCond()], [reconc_BUIS()]
 #'
@@ -292,7 +293,8 @@ reconc_TDcond = function(A, fc_bottom, fc_upper,
     U = .MVN_sample(n_samples = num_samples,
                     mu    = rec_gauss_u$bottom_reconciled_mean, 
                     Sigma = rec_gauss_u$bottom_reconciled_covariance)  
-    U = round(U)                 # round to integer
+    U = round(U)                # round
+    mode(U) <- "integer"        # convert to integer
     U_js = asplit(U, MARGIN = 2) # split into list of column vectors
   }
 

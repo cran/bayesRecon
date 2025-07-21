@@ -7,10 +7,10 @@ knitr::opts_chunk$set(
 set.seed(42)
 
 ## ----klippy, echo=FALSE, include=TRUE, eval=FALSE-----------------------------
-#  klippy::klippy(position = c('top', 'right'), tooltip_message = 'Copy', tooltip_success = 'Done', color="black")
+# klippy::klippy(position = c('top', 'right'), tooltip_message = 'Copy', tooltip_success = 'Done', color="black")
 
 ## ----install, eval=FALSE------------------------------------------------------
-#  install.packages('bayesRecon', dependencies = TRUE)
+# install.packages('bayesRecon', dependencies = TRUE)
 
 ## ----load---------------------------------------------------------------------
 library(bayesRecon)
@@ -105,7 +105,7 @@ crps.fc <- list()
 crps.reconc <- list()
 for (h in 1:length(test)) {
   y.hat_ <- median(fc.samples[[nrow(A) + h]])
-  y.reconc_ <- median(recon.res$bottom_reconciled_samples[, h])
+  y.reconc_ <- median(recon.res$bottom_reconciled_samples[h,])
   # Compute Absolute Errors
   ae.fc[[h]] <- abs(test[h] - y.hat_)
   ae.reconc[[h]] <- abs(test[h] - y.reconc_)
@@ -113,7 +113,7 @@ for (h in 1:length(test)) {
   crps.fc[[h]] <-
     scoringRules::crps_sample(y = test[h], dat = fc.samples[[nrow(A) + h]])
   crps.reconc[[h]] <-
-    scoringRules::crps_sample(y = test[h], dat = recon.res$bottom_reconciled_samples[, h])
+    scoringRules::crps_sample(y = test[h], dat = recon.res$bottom_reconciled_samples[h,])
 }
 
 mae.fc <- mean(unlist(ae.fc))
