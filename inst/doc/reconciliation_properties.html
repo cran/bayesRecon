@@ -50,8 +50,9 @@ overflow: visible;
 }
 </style>
 <style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -62,7 +63,7 @@ div.sourceCode { overflow: auto; }
 }
 @media print {
 pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
 { counter-reset: source-line 0; }
@@ -407,16 +408,16 @@ the predictive distributions are negative binomial.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Hierarchy composed by 6 time series: 5 bottom and 1 upper</span></span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>n_b <span class="ot">&lt;-</span> <span class="dv">5</span></span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>n_u <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>n <span class="ot">&lt;-</span> n_b <span class="sc">+</span> n_u   </span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>n <span class="ot">&lt;-</span> n_b <span class="sc">+</span> n_u</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, <span class="at">ncol =</span> n_b, <span class="at">nrow =</span> n_u)  <span class="co"># aggregation matrix</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>A <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="dv">1</span>, <span class="at">ncol =</span> n_b, <span class="at">nrow =</span> n_u) <span class="co"># aggregation matrix</span></span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Actual values:</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>actuals <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(extr_mkt_events)  <span class="co"># convert to data frame</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>actuals <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(extr_mkt_events) <span class="co"># convert to data frame</span></span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co"># Base forecasts:</span></span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>base_fc <span class="ot">&lt;-</span> extr_mkt_events_basefc</span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">nrow</span>(actuals)  <span class="co"># number of days (3508)</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="fu">nrow</span>(actuals) <span class="co"># number of days (3508)</span></span>
 <span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a></span>
 <span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a><span class="co"># # If you want to run only N reconciliations (instead of 3508):</span></span>
 <span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a><span class="co"># N &lt;- 200</span></span>
@@ -437,14 +438,14 @@ of 100,000 (as in the paper) to speed up the computation.</p>
 the reconciled distribution.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># We need to save the mean and median of the reconciled distribution</span></span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># in order to compute the squared error and the absolute error:</span></span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>rec_means   <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>rec_means <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>rec_medians <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a></span>
 <span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co"># We need to save the lower and upper quantiles of the reconciled distribution</span></span>
 <span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co"># in order to compute the interval score:</span></span>
 <span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>rec_L <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
 <span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>rec_U <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>int_cov <span class="ot">=</span> <span class="fl">0.9</span>   <span class="co"># use 90% interval         </span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>int_cov <span class="ot">&lt;-</span> <span class="fl">0.9</span> <span class="co"># use 90% interval</span></span>
 <span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>q1 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span> int_cov) <span class="sc">/</span> <span class="dv">2</span></span>
 <span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>q2 <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">+</span> int_cov) <span class="sc">/</span> <span class="dv">2</span></span>
 <span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a></span>
@@ -454,57 +455,66 @@ the reconciled distribution.</p>
 <span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>start <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
 <span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>N) {</span>
 <span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  <span class="co"># Base forecasts:</span></span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()   </span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
 <span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>    base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">size =</span> base_fc<span class="sc">$</span>size[[i]], <span class="at">mu =</span> base_fc<span class="sc">$</span>mu[[j,i]])</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>    base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">size =</span> base_fc<span class="sc">$</span>size[[i]], <span class="at">mu =</span> base_fc<span class="sc">$</span>mu[[j, i]])</span>
 <span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>  }</span>
-<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  </span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a></span>
 <span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="co"># Reconcile via importance sampling:</span></span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>, </span>
-<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>                      <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span>)</span>
-<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  samples_y <span class="ot">&lt;-</span> buis<span class="sc">$</span>reconciled_samples</span>
-<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>  </span>
-<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>  <span class="co"># Save mean, median, and lower and upper quantiles:</span></span>
-<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>  rec_means[j,]   <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(samples_y)</span>
-<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>  rec_medians[j,] <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y, <span class="dv">1</span>, median)</span>
-<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>  rec_L[j,]       <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y, <span class="dv">1</span>, quantile, q1)</span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>  rec_U[j,]       <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y, <span class="dv">1</span>, quantile, q2)</span>
-<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>}</span>
-<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>stop <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
-<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Computational time for &quot;</span>, N, <span class="st">&quot; reconciliations: &quot;</span>,     </span>
-<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a>    <span class="fu">round</span>(<span class="fu">difftime</span>(stop, start, <span class="at">units =</span> <span class="st">&quot;secs&quot;</span>), <span class="dv">2</span>), <span class="st">&quot;s&quot;</span>)</span>
-<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; Computational time for  3508  reconciliations:  31.27 s</span></span></code></pre></div>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>,</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>    <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  )</span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>  samples_y <span class="ot">&lt;-</span> <span class="fu">rbind</span>(buis<span class="sc">$</span>upper_rec_samples, buis<span class="sc">$</span>bottom_rec_samples)</span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>  <span class="co"># Save mean, median, and lower and upper quantiles:</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>  rec_means[j, ] <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(samples_y)</span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>  rec_medians[j, ] <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y, <span class="dv">1</span>, median)</span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>  rec_L[j, ] <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y, <span class="dv">1</span>, quantile, q1)</span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a>  rec_U[j, ] <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y, <span class="dv">1</span>, quantile, q2)</span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a>}</span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a>stop <span class="ot">&lt;-</span> <span class="fu">Sys.time</span>()</span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="fu">cat</span>(</span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a>  <span class="st">&quot;Computational time for &quot;</span>, N, <span class="st">&quot; reconciliations: &quot;</span>,</span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">difftime</span>(stop, start, <span class="at">units =</span> <span class="st">&quot;secs&quot;</span>), <span class="dv">2</span>), <span class="st">&quot;s&quot;</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a>)</span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; Computational time for  3508  reconciliations:  34.06 s</span></span></code></pre></div>
 <p>We compute the median and the quantiles of the negative binomial base
 forecasts.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>base_means   <span class="ot">&lt;-</span> base_fc<span class="sc">$</span>mu</span>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>base_means <span class="ot">&lt;-</span> base_fc<span class="sc">$</span>mu</span>
 <span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>base_medians <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>base_L       <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>base_U       <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>base_L <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>base_U <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, <span class="at">ncol =</span> n, <span class="at">nrow =</span> N)</span>
 <span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  base_medians[,i] <span class="ot">&lt;-</span> <span class="fu">sapply</span>(base_means[,i], </span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>                       <span class="cf">function</span>(mu) <span class="fu">qnbinom</span>(<span class="at">p=</span><span class="fl">0.5</span>, <span class="at">size=</span>base_fc<span class="sc">$</span>size[[i]], <span class="at">mu=</span>mu))</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>  base_L[,i]       <span class="ot">&lt;-</span> <span class="fu">sapply</span>(base_means[,i], </span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>                       <span class="cf">function</span>(mu) <span class="fu">qnbinom</span>(<span class="at">p=</span>q1,  <span class="at">size=</span>base_fc<span class="sc">$</span>size[[i]], <span class="at">mu=</span>mu))</span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  base_U[,i]       <span class="ot">&lt;-</span> <span class="fu">sapply</span>(base_means[,i], </span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>                       <span class="cf">function</span>(mu) <span class="fu">qnbinom</span>(<span class="at">p=</span>q2,  <span class="at">size=</span>base_fc<span class="sc">$</span>size[[i]], <span class="at">mu=</span>mu))</span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>}</span></code></pre></div>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  base_medians[, i] <span class="ot">&lt;-</span> <span class="fu">sapply</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    base_means[, i],</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    <span class="cf">function</span>(mu) <span class="fu">qnbinom</span>(<span class="at">p =</span> <span class="fl">0.5</span>, <span class="at">size =</span> base_fc<span class="sc">$</span>size[[i]], <span class="at">mu =</span> mu)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>  )</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  base_L[, i] <span class="ot">&lt;-</span> <span class="fu">sapply</span>(</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    base_means[, i],</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>    <span class="cf">function</span>(mu) <span class="fu">qnbinom</span>(<span class="at">p =</span> q1, <span class="at">size =</span> base_fc<span class="sc">$</span>size[[i]], <span class="at">mu =</span> mu)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  )</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>  base_U[, i] <span class="ot">&lt;-</span> <span class="fu">sapply</span>(</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>    base_means[, i],</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>    <span class="cf">function</span>(mu) <span class="fu">qnbinom</span>(<span class="at">p =</span> q2, <span class="at">size =</span> base_fc<span class="sc">$</span>size[[i]], <span class="at">mu =</span> mu)</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a>  )</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a>}</span></code></pre></div>
 <p>For each day and for each time series, we compute the absolute error,
 the squared error, and the interval score for the base and reconciled
 forecasts.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Compute the squared errors</span></span>
 <span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>SE_base <span class="ot">&lt;-</span> (base_means <span class="sc">-</span> actuals)<span class="sc">^</span><span class="dv">2</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>SE_rec  <span class="ot">&lt;-</span> (rec_means <span class="sc">-</span> actuals)<span class="sc">^</span><span class="dv">2</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>SE_rec <span class="ot">&lt;-</span> (rec_means <span class="sc">-</span> actuals)<span class="sc">^</span><span class="dv">2</span></span>
 <span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co"># Compute the absolute errors</span></span>
 <span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>AE_base <span class="ot">&lt;-</span> <span class="fu">abs</span>(base_medians <span class="sc">-</span> actuals)</span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>AE_rec  <span class="ot">&lt;-</span> <span class="fu">abs</span>(rec_medians <span class="sc">-</span> actuals)</span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>AE_rec <span class="ot">&lt;-</span> <span class="fu">abs</span>(rec_medians <span class="sc">-</span> actuals)</span>
 <span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
 <span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co"># Define the function for the interval score</span></span>
 <span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>int_score <span class="ot">&lt;-</span> <span class="cf">function</span>(l, u, actual, <span class="at">int_cov =</span> <span class="fl">0.9</span>) {</span>
 <span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>  is <span class="ot">&lt;-</span> (u <span class="sc">-</span> l) <span class="sc">+</span></span>
-<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>  <span class="dv">2</span> <span class="sc">/</span> (<span class="dv">1</span><span class="sc">-</span>int_cov) <span class="sc">*</span> (actual <span class="sc">-</span> u) <span class="sc">*</span> (actual<span class="sc">&gt;</span>u) <span class="sc">+</span></span>
-<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>  <span class="dv">2</span> <span class="sc">/</span> (<span class="dv">1</span><span class="sc">-</span>int_cov) <span class="sc">*</span> (l <span class="sc">-</span> actual) <span class="sc">*</span> (l<span class="sc">&gt;</span>actual) </span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>    <span class="dv">2</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> int_cov) <span class="sc">*</span> (actual <span class="sc">-</span> u) <span class="sc">*</span> (actual <span class="sc">&gt;</span> u) <span class="sc">+</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a>    <span class="dv">2</span> <span class="sc">/</span> (<span class="dv">1</span> <span class="sc">-</span> int_cov) <span class="sc">*</span> (l <span class="sc">-</span> actual) <span class="sc">*</span> (l <span class="sc">&gt;</span> actual)</span>
 <span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a>  <span class="fu">return</span>(is)</span>
 <span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a>}</span>
 <span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a></span>
@@ -523,13 +533,15 @@ symmetric and bounded between -2 and 2.</p>
 <span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>SS_SE[<span class="fu">is.na</span>(SS_SE)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>SS_IS[<span class="fu">is.na</span>(SS_IS)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>mean_skill_scores <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">round</span>(<span class="fu">colMeans</span>(SS_IS), <span class="dv">2</span>),</span>
-<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>                       <span class="fu">round</span>(<span class="fu">colMeans</span>(SS_SE), <span class="dv">2</span>),</span>
-<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>                       <span class="fu">round</span>(<span class="fu">colMeans</span>(SS_AE), <span class="dv">2</span>))</span>
-<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>mean_skill_scores <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">t</span>(<span class="fu">matrix</span>(mean_skill_scores, <span class="at">nrow =</span> n)))</span>
-<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="fu">colnames</span>(mean_skill_scores) <span class="ot">&lt;-</span> <span class="fu">names</span>(actuals)</span>
-<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="fu">rownames</span>(mean_skill_scores) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Interval score&quot;</span>, <span class="st">&quot;Squared error&quot;</span>, <span class="st">&quot;Absolute error&quot;</span>)</span>
-<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(mean_skill_scores)</span></code></pre></div>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>mean_skill_scores <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">colMeans</span>(SS_IS), <span class="dv">2</span>),</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">colMeans</span>(SS_SE), <span class="dv">2</span>),</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">colMeans</span>(SS_AE), <span class="dv">2</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>mean_skill_scores <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="fu">t</span>(<span class="fu">matrix</span>(mean_skill_scores, <span class="at">nrow =</span> n)))</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="fu">colnames</span>(mean_skill_scores) <span class="ot">&lt;-</span> <span class="fu">names</span>(actuals)</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="fu">rownames</span>(mean_skill_scores) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Interval score&quot;</span>, <span class="st">&quot;Squared error&quot;</span>, <span class="st">&quot;Absolute error&quot;</span>)</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(mean_skill_scores)</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -590,20 +602,27 @@ We show them for two different days.</p>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="do">### Example of concordant-shift effect</span></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>j <span class="ot">&lt;-</span> <span class="dv">124</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()   </span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">size =</span> extr_mkt_events_basefc<span class="sc">$</span>size[[i]],</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>                                      <span class="at">mu =</span> extr_mkt_events_basefc<span class="sc">$</span>mu[[j,i]])</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co"># Reconcile</span></span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>, </span>
-<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>                    <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span>)</span>
-<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>samples_y <span class="ot">&lt;-</span> buis<span class="sc">$</span>reconciled_samples</span>
-<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a></span>
-<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co"># The reconciled mean is lower than both the base and bottom-up means:</span></span>
-<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>means <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">round</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[[j,<span class="dv">1</span>]], <span class="dv">2</span>),</span>
-<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>           <span class="fu">round</span>(<span class="fu">sum</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[j,<span class="dv">2</span><span class="sc">:</span>n]), <span class="dv">2</span>),</span>
-<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>           <span class="fu">round</span>(<span class="fu">mean</span>(samples_y[<span class="dv">1</span>,]), <span class="dv">2</span>))</span>
-<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>col_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Base upper mean&quot;</span>, <span class="st">&quot;Bottom-up upper mean&quot;</span>, <span class="st">&quot;Reconciled upper mean&quot;</span>)</span>
-<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(means, <span class="at">nrow=</span><span class="dv">1</span>), <span class="at">col.names =</span> col_names)</span></code></pre></div>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>    <span class="at">size =</span> extr_mkt_events_basefc<span class="sc">$</span>size[[i]],</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>    <span class="at">mu =</span> extr_mkt_events_basefc<span class="sc">$</span>mu[[j, i]]</span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>  )</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>}</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co"># Reconcile</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>,</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>)</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>samples_y <span class="ot">&lt;-</span> <span class="fu">rbind</span>(buis<span class="sc">$</span>upper_rec_samples, buis<span class="sc">$</span>bottom_rec_samples)</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co"># The reconciled mean is lower than both the base and bottom-up means:</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>means <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a>  <span class="fu">round</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[[j, <span class="dv">1</span>]], <span class="dv">2</span>),</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">sum</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[j, <span class="dv">2</span><span class="sc">:</span>n]), <span class="dv">2</span>),</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">mean</span>(samples_y[<span class="dv">1</span>, ]), <span class="dv">2</span>)</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>)</span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>col_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Base upper mean&quot;</span>, <span class="st">&quot;Bottom-up upper mean&quot;</span>, <span class="st">&quot;Reconciled upper mean&quot;</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(means, <span class="at">nrow =</span> <span class="dv">1</span>), <span class="at">col.names =</span> col_names)</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -621,22 +640,29 @@ We show them for two different days.</p>
 </tbody>
 </table>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="do">### Example of combination effect </span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="do">### Example of combination effect</span></span>
 <span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>j <span class="ot">&lt;-</span> <span class="dv">1700</span></span>
-<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()   </span>
-<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">size =</span> extr_mkt_events_basefc<span class="sc">$</span>size[[i]],</span>
-<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>                                      <span class="at">mu =</span> extr_mkt_events_basefc<span class="sc">$</span>mu[[j,i]])</span>
-<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co"># Reconcile </span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>, </span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>                    <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span>)</span>
-<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>samples_y <span class="ot">&lt;-</span> buis<span class="sc">$</span>reconciled_samples</span>
-<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a></span>
-<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a><span class="co"># The reconciled mean is between the base and the bottom-up mean:</span></span>
-<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>means <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fu">round</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[[j,<span class="dv">1</span>]], <span class="dv">2</span>),</span>
-<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>           <span class="fu">round</span>(<span class="fu">sum</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[j,<span class="dv">2</span><span class="sc">:</span>n]), <span class="dv">2</span>),</span>
-<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>           <span class="fu">round</span>(<span class="fu">mean</span>(samples_y[<span class="dv">1</span>,]), <span class="dv">2</span>))</span>
-<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a>col_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Base upper mean&quot;</span>, <span class="st">&quot;Bottom-up upper mean&quot;</span>, <span class="st">&quot;Reconciled upper mean&quot;</span>)</span>
-<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(means, <span class="at">nrow=</span><span class="dv">1</span>), <span class="at">col.names =</span> col_names)</span></code></pre></div>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    <span class="at">size =</span> extr_mkt_events_basefc<span class="sc">$</span>size[[i]],</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    <span class="at">mu =</span> extr_mkt_events_basefc<span class="sc">$</span>mu[[j, i]]</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>  )</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>}</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a><span class="co"># Reconcile</span></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>,</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span></span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>)</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>samples_y <span class="ot">&lt;-</span> <span class="fu">rbind</span>(buis<span class="sc">$</span>upper_rec_samples, buis<span class="sc">$</span>bottom_rec_samples)</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a><span class="co"># The reconciled mean is between the base and the bottom-up mean:</span></span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>means <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="fu">round</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[[j, <span class="dv">1</span>]], <span class="dv">2</span>),</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">sum</span>(extr_mkt_events_basefc<span class="sc">$</span>mu[j, <span class="dv">2</span><span class="sc">:</span>n]), <span class="dv">2</span>),</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="fu">round</span>(<span class="fu">mean</span>(samples_y[<span class="dv">1</span>, ]), <span class="dv">2</span>)</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>)</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>col_names <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Base upper mean&quot;</span>, <span class="st">&quot;Bottom-up upper mean&quot;</span>, <span class="st">&quot;Reconciled upper mean&quot;</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">matrix</span>(means, <span class="at">nrow =</span> <span class="dv">1</span>), <span class="at">col.names =</span> col_names)</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">
@@ -658,23 +684,29 @@ series increases after reconciliation. This is a major difference with
 the Gaussian reconciliation, for which the reconciled variance is always
 smaller than the base variance.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>j <span class="ot">&lt;-</span> <span class="dv">2308</span></span>
-<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()   </span>
-<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">size =</span> extr_mkt_events_basefc<span class="sc">$</span>size[[i]],</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>                                      <span class="at">mu =</span> extr_mkt_events_basefc<span class="sc">$</span>mu[[j,i]])</span>
-<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co"># Reconcile</span></span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>, <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>samples_y <span class="ot">&lt;-</span> buis<span class="sc">$</span>reconciled_samples</span>
-<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a></span>
-<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co"># Compute the variance of the base and reconciled bottom forecasts</span></span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>base_bottom_var <span class="ot">&lt;-</span> <span class="fu">mapply</span>(<span class="cf">function</span>(mu, size) <span class="fu">var</span>(<span class="fu">rnbinom</span>(<span class="at">n =</span> <span class="fl">1e5</span>, <span class="at">size =</span> size, <span class="at">mu =</span> mu)),</span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>                          extr_mkt_events_basefc<span class="sc">$</span>mu[j,<span class="dv">2</span><span class="sc">:</span>n], </span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a>                          extr_mkt_events_basefc<span class="sc">$</span>size[<span class="dv">2</span><span class="sc">:</span>n])</span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>rec_bottom_var <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y[<span class="dv">2</span><span class="sc">:</span>n,], <span class="at">MARGIN =</span> <span class="dv">1</span>, var) </span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a></span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co"># The reconciled variance is greater than the base variance:</span></span>
-<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>bottom_var <span class="ot">&lt;-</span> <span class="fu">rbind</span>(base_bottom_var, rec_bottom_var)</span>
-<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="fu">rownames</span>(bottom_var) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;var base&quot;</span>, <span class="st">&quot;var reconc&quot;</span>)</span>
-<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">round</span>(bottom_var, <span class="dv">2</span>))</span></code></pre></div>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>base_fc_j <span class="ot">&lt;-</span> <span class="fu">c</span>()</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n) {</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  base_fc_j[[i]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>    <span class="at">size =</span> extr_mkt_events_basefc<span class="sc">$</span>size[[i]],</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>    <span class="at">mu =</span> extr_mkt_events_basefc<span class="sc">$</span>mu[[j, i]]</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>  )</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>}</span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co"># Reconcile</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>buis <span class="ot">&lt;-</span> <span class="fu">reconc_BUIS</span>(A, base_fc_j, <span class="st">&quot;params&quot;</span>, <span class="st">&quot;nbinom&quot;</span>, <span class="at">num_samples =</span> N_samples, <span class="at">seed =</span> <span class="dv">42</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a>samples_y <span class="ot">&lt;-</span> <span class="fu">rbind</span>(buis<span class="sc">$</span>upper_rec_samples, buis<span class="sc">$</span>bottom_rec_samples)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co"># Compute the variance of the base and reconciled bottom forecasts</span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a>base_bottom_var <span class="ot">&lt;-</span> <span class="fu">mapply</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>  <span class="cf">function</span>(mu, size) <span class="fu">var</span>(<span class="fu">rnbinom</span>(<span class="at">n =</span> <span class="fl">1e5</span>, <span class="at">size =</span> size, <span class="at">mu =</span> mu)),</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a>  extr_mkt_events_basefc<span class="sc">$</span>mu[j, <span class="dv">2</span><span class="sc">:</span>n],</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a>  extr_mkt_events_basefc<span class="sc">$</span>size[<span class="dv">2</span><span class="sc">:</span>n]</span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a>)</span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a>rec_bottom_var <span class="ot">&lt;-</span> <span class="fu">apply</span>(samples_y[<span class="dv">2</span><span class="sc">:</span>n, ], <span class="at">MARGIN =</span> <span class="dv">1</span>, var)</span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a><span class="co"># The reconciled variance is greater than the base variance:</span></span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a>bottom_var <span class="ot">&lt;-</span> <span class="fu">rbind</span>(base_bottom_var, rec_bottom_var)</span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="fu">rownames</span>(bottom_var) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;var base&quot;</span>, <span class="st">&quot;var reconc&quot;</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="fu">round</span>(bottom_var, <span class="dv">2</span>))</span></code></pre></div>
 <table>
 <thead>
 <tr class="header">

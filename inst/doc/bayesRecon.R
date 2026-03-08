@@ -2,15 +2,15 @@
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  eval=TRUE ### !!!! set to FALSE here to render only the text !!!!
+  eval = TRUE ### !!!! set to FALSE here to render only the text !!!!
 )
 set.seed(42)
 
 ## ----klippy, echo=FALSE, include=TRUE, eval=FALSE-----------------------------
-# klippy::klippy(position = c('top', 'right'), tooltip_message = 'Copy', tooltip_success = 'Done', color="black")
+# klippy::klippy(position = c("top", "right"), tooltip_message = "Copy", tooltip_success = "Done", color = "black")
 
 ## ----install, eval=FALSE------------------------------------------------------
-# install.packages('bayesRecon', dependencies = TRUE)
+# install.packages("bayesRecon", dependencies = TRUE)
 
 ## ----load---------------------------------------------------------------------
 library(bayesRecon)
@@ -22,7 +22,7 @@ hist(carparts_example, xlab = "Car part sales", main = NULL)
 
 ## ----train-test---------------------------------------------------------------
 train <- window(carparts_example, end = c(2001, 3))
-test  <- window(carparts_example, start = c(2001, 4))
+test <- window(carparts_example, start = c(2001, 4))
 
 ## ----temp-agg-----------------------------------------------------------------
 train.agg <- bayesRecon::temporal_aggregation(train, agg_levels = c(2, 3, 4, 6, 12))
@@ -37,7 +37,7 @@ for (l in levels) {
 
 ## ----hier-fore, cache=TRUE----------------------------------------------------
 # install.packages("glarma", dependencies = TRUE)
-#library(glarma)
+# library(glarma)
 
 fc.samples <- list()
 D <- 20000
@@ -75,25 +75,23 @@ for (l in seq_along(train.agg)) {
   }
 }
 
-
 ## ----aggregationMatrix--------------------------------------------------------
 recon.matrices <- bayesRecon::get_reconc_matrices(agg_levels = c(2, 3, 4, 6, 12), h = 12)
 # Aggregation matrix
-A <- recon.matrices$A 
+A <- recon.matrices$A
 
 ## ----reconc-------------------------------------------------------------------
 recon.res <- bayesRecon::reconc_BUIS(
   A,
-  base_forecasts = fc.samples,
+  base_fc = fc.samples,
   in_type = "samples",
   distr = "discrete",
   seed = 42
 )
 
 ## ----res----------------------------------------------------------------------
-reconciled_samples <- recon.res$reconciled_samples
+reconciled_samples <- recon.res$bottom_rec_samples
 dim(reconciled_samples)
-
 
 ## ----metrics------------------------------------------------------------------
 # install.packages("scoringRules", dependencies = TRUE)
@@ -105,7 +103,7 @@ crps.fc <- list()
 crps.reconc <- list()
 for (h in 1:length(test)) {
   y.hat_ <- median(fc.samples[[nrow(A) + h]])
-  y.reconc_ <- median(recon.res$bottom_reconciled_samples[h,])
+  y.reconc_ <- median(recon.res$bottom_rec_samples[h, ])
   # Compute Absolute Errors
   ae.fc[[h]] <- abs(test[h] - y.hat_)
   ae.reconc[[h]] <- abs(test[h] - y.reconc_)
@@ -113,7 +111,7 @@ for (h in 1:length(test)) {
   crps.fc[[h]] <-
     scoringRules::crps_sample(y = test[h], dat = fc.samples[[nrow(A) + h]])
   crps.reconc[[h]] <-
-    scoringRules::crps_sample(y = test[h], dat = recon.res$bottom_reconciled_samples[h,])
+    scoringRules::crps_sample(y = test[h], dat = recon.res$bottom_rec_samples[h, ])
 }
 
 mae.fc <- mean(unlist(ae.fc))
@@ -126,7 +124,6 @@ metrics <- data.frame(
   reconciled.forecasts = c(mae.reconc, crps.reconc)
 )
 metrics
-
 
 ## ----m3-plot, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 3**: M3 - N1485 time series.", fig.dim = c(6, 3)----
 plot(M3_example$train, xlab = "Time", ylab = "y", main = "N1485")
@@ -156,8 +153,10 @@ for (level in train.agg) {
   level.fc <- forecast(model, h = h)
   # save mean and sd of the gaussian predictive distribution
   for (i in 1:h) {
-    fc[[fc.idx]] <- list(mean = level.fc$mean[[i]],
-                         sd = (level.fc$upper[, "95%"][[i]] - level.fc$mean[[i]]) / qnorm(0.975))
+    fc[[fc.idx]] <- list(
+      mean = level.fc$mean[[i]],
+      sd = (level.fc$upper[, "95%"][[i]] - level.fc$mean[[i]]) / qnorm(0.975)
+    )
     fc.idx <- fc.idx + 1
   }
   level.idx <- level.idx + 1
@@ -166,23 +165,24 @@ for (level in train.agg) {
 ## ----m3-rmat, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 4**: M3 - The aggregation matrix A (red=1, yellow=0).", fig.dim = c(8, 8)----
 rmat <- get_reconc_matrices(agg_levels = c(2, 3, 4, 6, 12), h = 18)
 
-par(mai = c(1,1,0.5,0.5))
-image(1:ncol(rmat$A), 1:nrow(rmat$A), 
-      t(apply(t(rmat$A),1,rev)), 
-      xaxt='n', yaxt='n', ylab = "", xlab = levels[6])
-axis(1, at=1:ncol(rmat$A), label=1:ncol(rmat$A), las=1)
-axis(2, at=c(23,22,19,15,9), label=levels[1:5], las=2)
+par(mai = c(1, 1, 0.5, 0.5))
+image(1:ncol(rmat$A), 1:nrow(rmat$A),
+  t(apply(t(rmat$A), 1, rev)),
+  xaxt = "n", yaxt = "n", ylab = "", xlab = levels[6]
+)
+axis(1, at = 1:ncol(rmat$A), label = 1:ncol(rmat$A), las = 1)
+axis(2, at = c(23, 22, 19, 15, 9), label = levels[1:5], las = 2)
 
 ## ----m3-reco------------------------------------------------------------------
 recon.gauss <- bayesRecon::reconc_gaussian(
   A = rmat$A,
-  base_forecasts.mu = sapply(fc, "[[", 1),
-  base_forecasts.Sigma = diag(sapply(fc, "[[", 2)) ^ 2
+  base_fc_mean = sapply(fc, "[[", 1),
+  base_fc_cov = diag(sapply(fc, "[[", 2))^2
 )
 
 reconc.buis <- bayesRecon::reconc_BUIS(
   A = rmat$A,
-  base_forecasts = fc,
+  base_fc = fc,
   in_type = "params",
   distr = "gaussian",
   num_samples = 20000,
@@ -191,8 +191,8 @@ reconc.buis <- bayesRecon::reconc_BUIS(
 
 # check that the algorithms return consistent results
 round(rbind(
-  c(rmat$S %*% recon.gauss$bottom_reconciled_mean),
-  rowMeans(reconc.buis$reconciled_samples)
+  c(rmat$S %*% recon.gauss$bottom_rec_mean),
+  rowMeans(rbind(reconc.buis$upper_rec_samples, reconc.buis$bottom_rec_samples))
 ))
 
 ## ----m3-plotfore, dpi=300, out.width = "100%", fig.align='center', fig.cap="**Figure 5**: M3 - Base and reconciled forecasts. The black line shows the actual data (dashed in the test). The orange line is the  mean of the base forecasts, the blu line is the reconciled mean. We also show the 95% prediction intervals.", fig.dim = c(6, 4)----
@@ -200,31 +200,45 @@ yhat.mu <- tail(sapply(fc, "[[", 1), 18)
 yhat.sigma <- tail(sapply(fc, "[[", 2), 18)
 yhat.hi95 <- qnorm(0.975, mean = yhat.mu, sd = yhat.sigma)
 yhat.lo95 <- qnorm(0.025, mean = yhat.mu, sd = yhat.sigma)
-yreconc.mu <- rowMeans(reconc.buis$bottom_reconciled_samples)
-yreconc.hi95 <- apply(reconc.buis$bottom_reconciled_samples, 1, 
-                      function(x) quantile(x, 0.975))
-yreconc.lo95 <- apply(reconc.buis$bottom_reconciled_samples, 1, 
-                      function(x) quantile(x, 0.025))
+yreconc.mu <- rowMeans(reconc.buis$bottom_rec_samples)
+yreconc.hi95 <- apply(
+  reconc.buis$bottom_rec_samples, 1,
+  function(x) quantile(x, 0.975)
+)
+yreconc.lo95 <- apply(
+  reconc.buis$bottom_rec_samples, 1,
+  function(x) quantile(x, 0.025)
+)
 
-ylim_ <- c(min(M3_example$train, M3_example$test, yhat.lo95, yreconc.lo95) - 1, 
-           max(M3_example$train, M3_example$test, yhat.hi95, yreconc.hi95) + 1)
+ylim_ <- c(
+  min(M3_example$train, M3_example$test, yhat.lo95, yreconc.lo95) - 1,
+  max(M3_example$train, M3_example$test, yhat.hi95, yreconc.hi95) + 1
+)
 
-plot(M3_example$train, xlim = c(1990, 1995.6), ylim = ylim_, 
-     ylab = "y", main = "N1485 Forecasts")
+plot(M3_example$train,
+  xlim = c(1990, 1995.6), ylim = ylim_,
+  ylab = "y", main = "N1485 Forecasts"
+)
 lines(M3_example$test, lty = "dashed")
-lines(ts(yhat.mu, start = start(M3_example$test), frequency = 12), 
-      col = "coral", lwd = 2)
-lines(ts(yreconc.mu, start = start(M3_example$test), frequency = 12), 
-      col = "blue2", lwd = 2)
+lines(ts(yhat.mu, start = start(M3_example$test), frequency = 12),
+  col = "coral", lwd = 2
+)
+lines(ts(yreconc.mu, start = start(M3_example$test), frequency = 12),
+  col = "blue2", lwd = 2
+)
 xtest <- time(M3_example$test)
-polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.hi95)), 
-        col = "#FF7F5066", border = "#FF7F5066")
-polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.lo95)), 
-        col = "#FF7F5066", border = "#FF7F5066")
-polygon(c(xtest, rev(xtest)), c(yreconc.mu, rev(yreconc.hi95)), 
-        col = "#0000EE4D", border = "#0000EE4D")
-polygon(c(xtest, rev(xtest)), c(yreconc.mu, rev(yreconc.lo95)), 
-        col = "#0000EE4D", border = "#0000EE4D")
+polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.hi95)),
+  col = "#FF7F5066", border = "#FF7F5066"
+)
+polygon(c(xtest, rev(xtest)), c(yhat.mu, rev(yhat.lo95)),
+  col = "#FF7F5066", border = "#FF7F5066"
+)
+polygon(c(xtest, rev(xtest)), c(yreconc.mu, rev(yreconc.hi95)),
+  col = "#0000EE4D", border = "#0000EE4D"
+)
+polygon(c(xtest, rev(xtest)), c(yreconc.mu, rev(yreconc.lo95)),
+  col = "#0000EE4D", border = "#0000EE4D"
+)
 
 ## ----infants-forecasts--------------------------------------------------------
 # install.packages("forecast", dependencies = TRUE)
@@ -232,8 +246,9 @@ library(forecast)
 
 fc <- list()
 residuals <- matrix(NA,
-                    nrow = length(infantMortality$total),
-                    ncol = length(infantMortality))
+  nrow = length(infantMortality$total),
+  ncol = length(infantMortality)
+)
 fc.idx <- 1
 for (s in infantMortality) {
   s.name <- names(infantMortality)[fc.idx]
@@ -242,33 +257,38 @@ for (s in infantMortality) {
   model <- auto.arima(s)
   s.fc <- forecast(model, h = 1)
   # save mean and sd of the gaussian predictive distribution
-  fc[[s.name]] <- c(s.fc$mean,
-                    (s.fc$upper[, "95%"][[1]] - s.fc$mean) / qnorm(0.975))
+  fc[[s.name]] <- c(
+    s.fc$mean,
+    (s.fc$upper[, "95%"][[1]] - s.fc$mean) / qnorm(0.975)
+  )
   residuals[, fc.idx] <- s.fc$residuals
   fc.idx <- fc.idx + 1
 }
 
 ## ----infants-s, dpi=300, out.width = '70%', fig.align='center', fig.cap="**Figure 6**: Infants mortality - The aggregation matrix A (red=1, yellow=0).", fig.dim = c(8, 8)----
 # we have 16 bottom time series, and 11 upper time series
-A <- matrix(data = c(1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-                     1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-                     0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,
-                     0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,
-                     0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,
-                     0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,
-                     0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,
-                     0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,
-                     0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,
-                     1,0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,
-                     0,1,0,1,0,1,0,1,0,1,0,1,0,1,0,1), byrow=TRUE, ncol = 16)
+A <- matrix(data = c(
+  1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+  1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0,
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
+  1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0,
+  0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
+), byrow = TRUE, ncol = 16)
 
 # plot of A
-par(mai = c(1.5,1,0.5,0.5))
-image(1:ncol(A), 1:nrow(A), 
-      t(apply(t(A),1,rev)), 
-      xaxt='n', yaxt='n', ann=FALSE)
-axis(1, at=1:ncol(A), label=names(infantMortality)[12:27], las=2)
-axis(2, at=c(1:11), label=rev(names(infantMortality)[1:11]), las=2)
+par(mai = c(1.5, 1, 0.5, 0.5))
+image(1:ncol(A), 1:nrow(A),
+  t(apply(t(A), 1, rev)),
+  xaxt = "n", yaxt = "n", ann = FALSE
+)
+axis(1, at = 1:ncol(A), label = names(infantMortality)[12:27], las = 2)
+axis(2, at = c(1:11), label = rev(names(infantMortality)[1:11]), las = 2)
 
 ## ----infants reconc-----------------------------------------------------------
 # means
@@ -280,11 +300,12 @@ Sigma <- shrink.res$shrink_cov
 
 ## ----infants-recon------------------------------------------------------------
 recon.gauss <- bayesRecon::reconc_gaussian(A,
-                                           base_forecasts.mu = mu,
-                                           base_forecasts.Sigma = Sigma)
+  base_fc_mean = mu,
+  base_fc_cov = Sigma
+)
 
-bottom_mu_reconc <- recon.gauss$bottom_reconciled_mean
-bottom_Sigma_reconc <- recon.gauss$bottom_reconciled_covariance
+bottom_mu_reconc <- recon.gauss$bottom_rec_mean
+bottom_Sigma_reconc <- recon.gauss$bottom_rec_covariance
 
 # Obtain reconciled mu and Sigma for the upper variable
 upper_mu_reconc <- A %*% bottom_mu_reconc
