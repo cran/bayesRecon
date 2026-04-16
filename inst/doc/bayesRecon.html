@@ -591,41 +591,38 @@ every level we predict 18 months ahead. All the predictive distributions
 are Gaussian.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># install.packages(&quot;forecast&quot;, dependencies = TRUE)</span></span>
 <span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">library</span>(forecast)</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; Registered S3 method overwritten by &#39;quantmod&#39;:</span></span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co">#&gt;   method            from</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a><span class="co">#&gt;   as.zoo.data.frame zoo</span></span>
-<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
-<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>H <span class="ot">&lt;-</span> <span class="fu">length</span>(M3_example<span class="sc">$</span>test)</span>
-<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>H</span>
-<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; [1] 18</span></span>
-<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>fc <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>level.idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>fc.idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
-<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="cf">for</span> (level <span class="cf">in</span> train.agg) {</span>
-<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>  level.name <span class="ot">&lt;-</span> <span class="fu">names</span>(train.agg)[level.idx]</span>
-<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>  <span class="co"># fit an ETS model for each temporal level</span></span>
-<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">ets</span>(level)</span>
-<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>  <span class="co"># generate forecasts for each level within 18 months</span></span>
-<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>  h <span class="ot">&lt;-</span> <span class="fu">floor</span>(H <span class="sc">/</span> (<span class="dv">12</span> <span class="sc">/</span> <span class="fu">frequency</span>(level)))</span>
-<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;Forecasting at &quot;</span>, level.name, <span class="st">&quot;, h=&quot;</span>, h, <span class="st">&quot;...&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>))</span>
-<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>  level.fc <span class="ot">&lt;-</span> <span class="fu">forecast</span>(model, <span class="at">h =</span> h)</span>
-<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>  <span class="co"># save mean and sd of the gaussian predictive distribution</span></span>
-<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h) {</span>
-<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>    fc[[fc.idx]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>      <span class="at">mean =</span> level.fc<span class="sc">$</span>mean[[i]],</span>
-<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a>      <span class="at">sd =</span> (level.fc<span class="sc">$</span>upper[, <span class="st">&quot;95%&quot;</span>][[i]] <span class="sc">-</span> level.fc<span class="sc">$</span>mean[[i]]) <span class="sc">/</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)</span>
-<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a>    )</span>
-<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a>    fc.idx <span class="ot">&lt;-</span> fc.idx <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a>  }</span>
-<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a>  level.idx <span class="ot">&lt;-</span> level.idx <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a>}</span>
-<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Annual, h=1...&quot;</span></span>
-<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Biannual, h=3...&quot;</span></span>
-<span id="cb14-34"><a href="#cb14-34" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at 4-Monthly, h=4...&quot;</span></span>
-<span id="cb14-35"><a href="#cb14-35" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Quarterly, h=6...&quot;</span></span>
-<span id="cb14-36"><a href="#cb14-36" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at 2-Monthly, h=9...&quot;</span></span>
-<span id="cb14-37"><a href="#cb14-37" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Monthly, h=18...&quot;</span></span></code></pre></div>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>H <span class="ot">&lt;-</span> <span class="fu">length</span>(M3_example<span class="sc">$</span>test)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>H</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; [1] 18</span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>fc <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>level.idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>fc.idx <span class="ot">&lt;-</span> <span class="dv">1</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a><span class="cf">for</span> (level <span class="cf">in</span> train.agg) {</span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>  level.name <span class="ot">&lt;-</span> <span class="fu">names</span>(train.agg)[level.idx]</span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a>  <span class="co"># fit an ETS model for each temporal level</span></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a>  model <span class="ot">&lt;-</span> <span class="fu">ets</span>(level)</span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>  <span class="co"># generate forecasts for each level within 18 months</span></span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>  h <span class="ot">&lt;-</span> <span class="fu">floor</span>(H <span class="sc">/</span> (<span class="dv">12</span> <span class="sc">/</span> <span class="fu">frequency</span>(level)))</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>  <span class="fu">print</span>(<span class="fu">paste</span>(<span class="st">&quot;Forecasting at &quot;</span>, level.name, <span class="st">&quot;, h=&quot;</span>, h, <span class="st">&quot;...&quot;</span>, <span class="at">sep =</span> <span class="st">&quot;&quot;</span>))</span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>  level.fc <span class="ot">&lt;-</span> <span class="fu">forecast</span>(model, <span class="at">h =</span> h)</span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>  <span class="co"># save mean and sd of the gaussian predictive distribution</span></span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a>  <span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>h) {</span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>    fc[[fc.idx]] <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>      <span class="at">mean =</span> level.fc<span class="sc">$</span>mean[[i]],</span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>      <span class="at">sd =</span> (level.fc<span class="sc">$</span>upper[, <span class="st">&quot;95%&quot;</span>][[i]] <span class="sc">-</span> level.fc<span class="sc">$</span>mean[[i]]) <span class="sc">/</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>)</span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>    )</span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>    fc.idx <span class="ot">&lt;-</span> fc.idx <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a>  }</span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a>  level.idx <span class="ot">&lt;-</span> level.idx <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a>}</span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Annual, h=1...&quot;</span></span>
+<span id="cb14-30"><a href="#cb14-30" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Biannual, h=3...&quot;</span></span>
+<span id="cb14-31"><a href="#cb14-31" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at 4-Monthly, h=4...&quot;</span></span>
+<span id="cb14-32"><a href="#cb14-32" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Quarterly, h=6...&quot;</span></span>
+<span id="cb14-33"><a href="#cb14-33" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at 2-Monthly, h=9...&quot;</span></span>
+<span id="cb14-34"><a href="#cb14-34" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Forecasting at Monthly, h=18...&quot;</span></span></code></pre></div>
 <p>Using the function <code>get_reconc_matrices</code>, we get matrix
 <span class="math inline">\(\mathbf{A}\)</span>.</p>
 <div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>rmat <span class="ot">&lt;-</span> <span class="fu">get_reconc_matrices</span>(<span class="at">agg_levels =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">12</span>), <span class="at">h =</span> <span class="dv">18</span>)</span>
@@ -845,7 +842,7 @@ the covariance matrix of the residuals with shrinkage <span class="citation">(Sc
 <span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>)</span>
 <span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a></span>
 <span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>bottom_mu_reconc <span class="ot">&lt;-</span> recon.gauss<span class="sc">$</span>bottom_rec_mean</span>
-<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>bottom_Sigma_reconc <span class="ot">&lt;-</span> recon.gauss<span class="sc">$</span>bottom_rec_covariance</span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>bottom_Sigma_reconc <span class="ot">&lt;-</span> recon.gauss<span class="sc">$</span>bottom_rec_cov</span>
 <span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a></span>
 <span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="co"># Obtain reconciled mu and Sigma for the upper variable</span></span>
 <span id="cb21-10"><a href="#cb21-10" tabindex="-1"></a>upper_mu_reconc <span class="ot">&lt;-</span> A <span class="sc">%*%</span> bottom_mu_reconc</span>
